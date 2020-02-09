@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="main">
+    <table id="tb" cellpadding="1" cellspacing="1">
+      <thead>
+        <tr>
+          <th></th>
+          <th onclick="sortColumn(1)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">S</th>
+          <th onclick="sortColumn(1)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">M</th>
+          <th onclick="sortColumn(1)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th onclick="sortRow(this)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">胸围</th>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">-2</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">0</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">2</td>
+        </tr>
+        <tr>
+          <th onclick="sortRow(this)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">衣长</th>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">-3</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">0</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">3</td>
+        </tr>
+        <tr>
+          <th onclick="sortRow(this)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">腰围</th>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">-1</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">0</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">1</td>
+        </tr>
+        <tr>
+          <th onclick="sortRow(this)" onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">领围</th>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">-1</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">0</td>
+          <td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" ondblclick="inputValue(this)">1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>

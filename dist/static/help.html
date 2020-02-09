@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>帮助文档</title>
+</head>
+
+<script src="jquery.min.js"></script>
+<script>
+  //0
+  //1 主管
+  //2 管理员
+    $(document).ready(function(){    
+        var role =getUrlParam('role');
+console.log(getUrlParam('role'));  
+if(role==0){
+  $('#putong').show();
+  $('#zhuguan').hide();
+  $('#guanliyuan').hide()
+}
+ else if(role==1){
+  $('#putong').hide();
+  $('#zhuguan').show();
+  $('#guanliyuan').hide()
+}else{
+  $('#putong').hide();
+  $('#zhuguan').hide();
+  $('#guanliyuan').show();
+}
+});  
+  
+function getUrlParam(name){  
+//构造一个含有目标参数的正则表达式对象  
+var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");  
+//匹配目标参数  
+var r = window.location.search.substr(1).match(reg);  
+//返回参数值  
+if (r!=null) return unescape(r[2]);  
+return null;  
+}  
+</script>
+<body>
+  <div class="app-container">
+    <!-- ①②③④⑤⑥⑦⑧⑨ -->
+    <div class="wrapper">
+      <p>ETMES 调度系统 功能帮助文档</p>
+      <p>布易科技</p>
+      <!-- <p>2018年8月15日</p> -->
+      <div id="guanliyuan">
+          <p>管理员身份用户</p>
+          <p>1.	如何编辑管理员个人信息？</p>
+          <p>点击网页右上角的个人信息，如图：</p>
+          <img style="width: 50%; height: 190px;" src="../static/img/helpImg/g1.png" alt="暂无图片" srcset="">
+          <p>2.编辑个人信息姓名，密码必填，手机号选填。2.姓名长度在 2 到 5 个字符。3.密码长度在 4 到 10 个字符。</p>
+          <img style=" height: 500px;" src="../static/img/helpImg/g2.png" alt="暂无图片" srcset="">
+          <p>3.员工管理页面可以更改员工的状态，以及重置该员工的密码。（重置密码后会提示，默认888888）</p>
+          <img style=" " src="../static/img/helpImg/g3.png" alt="暂无图片" srcset="">
+          <p>4.品类管理页面点击添加按钮添加品类(不可重复添加相同品类)，点击删除按钮删除当前品类。</p>
+          <img style=" " src="../static/img/helpImg/g4.png" alt="暂无图片" srcset="">
+          <p>5.如何新建流水线,以及编辑流水线？</p>
+           <p>①点击添加按钮添加流水线。②流水线名称与主管工号都必填。填写主管工号时，相当于添加了此员工。</p>
+           <img style=" " src="../static/img/helpImg/g5.png" alt="暂无图片" srcset="">
+           <p>下图为编辑流水线。新增主管规则与上一样。</p>
+           <img style="width: 78%;height: 231px; " src="../static/img/helpImg/g6.png" alt="暂无图片" srcset="">
+           <p>6.系统维护：供服务人员使用。</p>
+           <div>
+            ①下载日志按钮可以下载后台日志。
+            ②设定FTP密码可以修改服务器上设定的FTP密码。<br>
+            ③上传二次编号。
+            ④打开调试后台会生成日志文件。
+            
+           </div>
+      </div>
+
+      <div id="zhuguan">
+        <p>主管身份用户</p>
+        <p style=" font-size: 33px;">一、个人信息</p>
+        <p>调度页面右上角的功能。</p>
+        <img src="../static/img/helpImg/z1.png" alt="暂无图片" srcset="">
+        <p>个人信息如何编辑？ </p>
+        <p>1.编辑个人信息姓名，密码必填，手机号选填。2.姓名长度在 2 到 5 个字符。3.密码长度在 4 到 10 个字符。</p>
+        <img src="../static/img/helpImg/z2.png" alt="">
+        <p style=" font-size: 33px;">二、员工管理</p>
+        <img src="../static/img/helpImg/z3.png" alt="暂无图片" srcset="">
+        <p>1.添加员工<br>
+          ①工号必填且必须纯数字。工序也必选（注：只有选择特体工序后才能够选择品类且一人最多三道工序）。</p>
+          <p>②只有该员工有做‘特体检查’时，品类选择框才会出现。一旦选择品类，那么在‘特体检查’环节就只能申请该品类的任务。不选则所有品类任务都能申请</p>
+          <p>③分组（注：同一组员工只能申请同一组员工所做任务，特体检查除外）。</p>
+          <img src="../static/img/helpImg/z4.png" alt="暂无图片" srcset="">
+          <p>2.如何编辑员工信息？</p>
+       <p>①点击员工工号进行员工信息编辑。</p>
+       <img src="../static/img/helpImg/z5.png" alt="暂无图片" srcset="">
+       <img src="../static/img/helpImg/z6.png" alt="暂无图片" srcset="">
+        <p style=" font-size: 33px;">三、模板导入</p>
+        <p>1.如何导入模板文件？</p>
+        <p>①在服务器上建立与主管工号相同名的文件夹，把做好的模板文件放入</p>
+        <img src="../static/img/helpImg/z7.png" alt="暂无图片" srcset="">
+        <p>②之后再登录此主管账号，填写模板信息，点击网页左侧菜单‘模板导入’ </p>
+        <img src="../static/img/helpImg/z8.png" alt="暂无图片" srcset="">
+        <p>③导入成功后，服务器上的模板文件会在服务器的该目录下</p> 
+        <img src="../static/img/helpImg/z9.png" alt="暂无图片" srcset="">
+        <p> ④此功能导入模板文件方式，也可替换已上传的模板文件<br>
+          替换条件：替换模板文件款名必须一样，且样式信息≥已上传的模板样式信息（注：也必须包含已上传模板的样式信息）</p>  
+         
+        <p style=" font-size: 33px;">四、款式查询</p>
+        <p>1.查询</p>
+        <img src="../static/img/helpImg/z10.png" alt="暂无图片" srcset="">
+        <p>2.点击款名编辑模板信息</p>
+        <img src="../static/img/helpImg/z12.png" alt="暂无图片" srcset=""><br>
+        <img src="../static/img/helpImg/z13.png" alt="暂无图片" srcset="">
+        <p>3.点击样板名查看该样式由谁上传以及上传该样式图片</p>
+        <img src="../static/img/helpImg/z14.png" alt="暂无图片" srcset=""><br>
+        <img src="../static/img/helpImg/z15.png" alt="暂无图片" srcset="">
+        <p>4.注：如果只是单纯的想要增加一个样式。可以用下面的功能。<br>
+            进入ET打版，选择定制功能菜单下的‘样式上传’，就可以新增样式。（注：此功能也只限于新增样式。）
+            </p>
+            <img src="../static/img/helpImg/z16.png" alt="暂无图片" srcset="">
+            <img src="../static/img/helpImg/z17.png" alt="暂无图片" srcset="">
+            <img src="../static/img/helpImg/z18.png" alt="暂无图片" srcset="">
+            <p style=" font-size: 33px;">五、流水线管理</p>
+            <p>1.如何编辑流水线？</p>
+            <p>①点击流水线名称更改流水线名。</p>
+            <p>②点击编辑按钮修改对应流水线工序的权重。</p>
+            <img style=" " src="../static/img/helpImg/z29.png" alt="暂无图片" srcset="">
+        
+        <p style=" font-size: 33px;">六、生产单查询</p>
+        <p>1.查询</p>
+        <img src="../static/img/helpImg/z19.png" alt="暂无图片" srcset="">
+  <p>2.删除：可以删除该订单</p>
+  <p>3.重置：只有已完成的生产单才能重置，且重置只是重置裁剪规划，且只能提交此生产单裁剪规划的员工才能重新下载。</p>
+  <p>4.点击生产单号进入生产单详情,特体进行特体列表详情，件数进入量体信息列表，床进入床数列表信息</p>
+  <img src="../static/img/helpImg/z20.png" alt="暂无图片" srcset="">
+  <p>5.生产单绑定</p>
+   <!-- ①②③④⑤⑥⑦⑧⑨ -->
+  <p>
+      ①打开绑定开关点击查询绑定的生产单。<br>
+      ②勾选订单前面的勾选项，之后再点击右上角的绑定，那么此订单就会绑定在一起。<br>
+      ③两个以上订单绑定后，在申请裁剪规划任务时，是一起申请过来的，<br>
+      前提是绑定的生产单都应该做裁剪规划工序了，才能够申请任务，否则申请不了任务。<br>
+      ④绑定条件：①物料相同②样式一致③样式不一致④人员（指订单里的ID）人数、件数一致（两个订单之间同一人的件数能配套）。<br>
+      符合①②或者①③④情况才能够绑定。
+  </p>
+  <img src="../static/img/helpImg/z21.png" alt="暂无图片" srcset="">
+        <p style=" font-size: 33px;">七、统计</p>
+        <p>1.往年统计</p>
+        <img src="../static/img/helpImg/z22.png" alt="暂无图片" srcset="">
+        <p>2.当年统计</p>
+        <img src="../static/img/helpImg/z23.png" alt="暂无图片" srcset="">
+        <p>3.计件统计</p>
+        <img src="../static/img/helpImg/z24.png" alt="暂无图片" srcset="">
+        <p>4.样板统计</p>
+        <img src="../static/img/helpImg/z25.png" alt="暂无图片" srcset="">
+        <p style=" font-size: 33px;">八、查询</p>
+        <p>1.查看日志：可以看到未完成的订单，当前的工序走到哪一步</p>
+        <img src="../static/img/helpImg/z27.png" alt="暂无图片" srcset="">
+        <p>2.流水号查询：可查询此流水号所有订单中的某个人员，以及下载此人的pod文件。</p>
+        <img src="../static/img/helpImg/z26.png" alt="暂无图片" srcset="">
+        
+      </div>
+    <div id="putong">
+        <p>
+            普通员工身份 </p>
+            <p style=" font-size: 33px;">一、个人信息</p>
+          <p>如何编辑个人信息？</p>
+          <img src="../static/img/helpImg/z1.png" alt="暂无图片" srcset="">
+        <p>1.编辑个人信息姓名，密码必填，手机号选填。2.姓名长度在 2 到 5 个字符。3.密码长度在 4 到 10 个字符。</p>
+        <img src="../static/img/helpImg/z2.png" alt="">
+            
+            <p style=" font-size: 33px;">二、生产单查询</p>
+            <p>1.查询</p>
+            <img src="../static/img/helpImg/z19.png" alt="暂无图片" srcset="">
+      <p>2.删除：可以删除该订单</p>
+      <p>3.重置：只有已完成的生产单才能重置，且重置只是重置裁剪规划，且只能提交此生产单裁剪规划的员工才能重新下载。</p>
+      <p>4.点击生产单号进入生产单详情,特体进行特体列表详情，件数进入量体信息列表，床进入床数列表信息</p>
+      <img src="../static/img/helpImg/z20.png" alt="暂无图片" srcset="">
+      <p>5.生产单绑定</p>
+       <!-- ①②③④⑤⑥⑦⑧⑨ -->
+      <p>
+          ①打开绑定开关点击查询绑定的生产单。<br>
+          ②勾选订单前面的勾选项，之后再点击右上角的绑定，那么此订单就会绑定在一起。<br>
+          ③两个以上订单绑定后，在申请裁剪规划任务时，是一起申请过来的，<br>
+          前提是绑定的生产单都应该做裁剪规划工序了，才能够申请任务，否则申请不了任务。<br>
+          ④绑定条件：①物料相同②样式一致③样式不一致④人员（指订单里的ID）人数、件数一致（两个订单之间同一人的件数能配套）。<br>
+          符合①②或者①③④情况才能够绑定。
+      </p>
+      <img src="../static/img/helpImg/z21.png" alt="暂无图片" srcset="">
+
+            <p>三、 计件统计</p>
+            <p>1.选择对应时间，工序查询当前计件统计
+              2.只能查询当前用户的计件信息
+            </p>
+            <img src="../static/img/helpImg/p1.png" alt="暂无图片" srcset="">
+          
+            <p style=" font-size: 33px;">四、 查询</p>
+            <p>1.查看日志：可以看到未完成的订单，当前的工序走到哪一步</p>
+            <img src="../static/img/helpImg/z27.png" alt="暂无图片" srcset="">
+            <p>2.流水号查询：可查询此流水号所有订单中的某个人员，以及下载此人的pod文件。</p>
+            <img src="../static/img/helpImg/z26.png" alt="暂无图片" srcset="">
+            
+         
+    </div>
+      
+    </div>
+  </div>
+</body>
+
+<style>
+  p {
+    font-size: 23px;
+  }
+
+  .wrapper {
+    /* width: 800px; */
+    margin: 30px auto;
+  }
+
+  .wrapper p:nth-child(1) {
+    color: #5B9BD5;
+    font-size: 30px;
+  }
+
+  .wrapper p:nth-child(2) {
+    color: rgb(12, 4, 4);
+    font-size: 23px;
+  }
+
+  .wrapper p:nth-child(3) {
+    color: rgb(12, 4, 4);
+    font-size: 23px;
+  }
+
+  .wrapper p:nth-child(4) {
+    color: red;
+    font-size: 30px;
+  }
+
+  .wrapper p:nth-child(5) {
+    color: rgb(12, 4, 4);
+    font-size: 23px;
+  }
+
+</style>
+
+</html>

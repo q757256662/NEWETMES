@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/ajax.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+    <title>File</title>
+</head>
+<style>
+    .head-logo {
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .head-href {
+        left: -308px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .head-logo .logo {
+        /* left: -308px; */
+        position: relative;
+        height: 50px;
+    }
+
+    .herder-user {
+        position: relative;
+        left: 300px;
+        border: 0px solid;
+        border-radius: 50px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .head-logo .user-text {
+        position: relative;
+        left: 302px;
+        top: -25px;
+        text-decoration: none
+    }
+
+    .head-logo:hover {
+        cursor: pointer;
+    }
+
+    .detail {
+        margin: 8px;
+
+    }
+
+    .detail {
+        text-decoration: none;
+        color: blue;
+    }
+
+    .detail:hover {
+        /* color: #38f; */
+        cursor: pointer;
+
+    }
+
+    .search-title {
+        font-size: 23px;
+        line-height: 36px;
+        height: 36px;
+    }
+
+    .search-title input {
+        height: 25px;
+        font-size: 18px;
+    }
+
+    .search-title button {
+        width: 50px;
+        height: 30px;
+        line-height: 27px;
+
+    }
+
+    .fileList {
+        margin-top: 30px;
+    }
+
+    .footer {
+        margin-top: 20px;
+    }
+</style>
+
+<body onload="initTwoArr()">
+    <div class="head-logo">
+        <a class="head-href" href="http://www.etsystem.cn/" target="blank">
+            <img class="logo" src="img/logo.png" alt="">
+        </a>
+        <img class="herder-user" src="img/user.png" alt="">
+        <a class="user-text">测试用户</a>
+    </div>
+    <div class="search-title">
+        文件名称/款名：
+        <!-- <input type="text"> 版单ID: -->
+        <input id="query" type="text">
+        <button onclick="handleSearch()">搜索</button>
+    </div>
+    <div class="fileList" id="fileList">
+
+    </div>
+    <div id="page" class="page_div"></div>
+    <div class="href-html">
+        <a href="Model.html">跳转版单</a>
+    </div>
+    <div class="footer">
+        <!--页脚-->
+        <footer>
+            <strong>Copyright 2019
+                <a href="http://www.etsystem.cn/" target="blank">©深圳布易科技有限公司</a>
+                All Rights Reserved.
+                <!-- <img src="static/img/logo-blank.png" style="padding:10px"> -->
+            </strong>
+        </footer>
+    </div>
+</body>
+<script>
+    var queryForm = {
+        query: '',
+        projectID: 0,
+        pageIndex: 1,
+        pageSize: 10,
+        token: token,
+        fileType: GetUrlParam("fileType")
+    }
+    function initTwoArr() {
+        GetToken();
+        fileList(queryForm);
+    }
+    function GetToken() {
+        let mes = '';
+
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1000, 860);
+        } else {
+            mes = window.buyiGetToken(1000, 860);
+        }
+        // alert(mes);返回值是mac;
+    }
+    //OpenFile 文件列表
+    function OpenFile() {
+        //   console.log(arguments)
+        getOpenInfo(arguments[0].id, arguments[0].name, arguments[0].tabIndex);
+    }
+    //打开参数info
+    function getOpenInfo(id, name, index) {
+        var type = ''; // 类型
+        var urlType = '';//对应api
+        //判断文件类型
+        if (GetUrlParam("fileType") == "BD") {
+            type = "model";
+            urlType = "/bmapi/demo/buyiLockModel"
+        } else {
+            type = "order";
+            urlType = "/bmapi/demo/buyiLockOrder"
+        }
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getopenfileftp',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    fileId: id,
+                    token: token
+                },
+                success: function (result) {
+                    // alert(JSON.stringify(result))
+                    var state = '';
+                    if (bowserExplorer == 'ie') {
+                        state = window.external.openFile(type, JSON.stringify(result.Data.data), JSON.stringify(result.Data.FTP));
+                    } else {
+                        state = window.buyiOpenFile(type, JSON.stringify(result.Data.data), JSON.stringify(result.Data.FTP));
+                    }
+                    if (state == 'OK') {
+                        if (bowserExplorer == 'ie') {
+                            window.external.closeDialog(0);
+                        } else {
+                            window.buyiCloseDialog(0);
+                        }
+                        //锁定版单或者生产单 buyiLockModel --- ModelId 
+                        $.ajax(
+                            {
+                                url: requestUrl + urlType,
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    ModelId: result.Data.data.id,
+                                    token: token
+                                },
+                                success: function (result) {
+                                    // console.log(result);
+                                },
+                                error: function (xhr, status, p3, p4) {
+                                    var err = "Error " + " " + status + " " + p3;
+                                    if (xhr.responseText && xhr.responseText[0] == "{")
+                                        err = JSON.parse(xhr.responseText).message;
+                                    alert(err);
+                                }
+                            });
+                    } else {
+                        alert(state);
+                    }
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    //搜索
+    function handleSearch() {
+        let qurey = document.getElementById('query').value;
+        if (qurey.replace(/\s+/g, "") == '') {
+            alert('请输入查询条件！')
+        } else {
+            queryForm.query = qurey;
+            fileList(queryForm);
+        }
+    }
+    //文件列表显示
+    function fileList(queryForm) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getFileList',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    // console.log(result);
+                    if (result.Data.Rows !== null) {
+
+                        let tablelist = '<table class="" style="width:700px;margin:0 auto;" width="700" ><tbody>';
+                        tablelist += '<th align="center">序号</th><th align="center">文件名</th><th align="center">款名</th><th align="center">路径</th><th align="center">时间</th>'
+                        for (let i = 0; i < result.Data.Rows.length; i++) {
+
+                            tablelist += '<tr style="height:45px;"><td>' + (i + 1) + '</td>' + '<td><a class="detail" name="' + result.Data.Rows[i].StyleName + '" id="' + result.Data.Rows[i].Id + '" tabIndex="' + i + '"  onclick="OpenFile(this)">' + result.Data.Rows[i].FileName + '</a></td>' + "<td> " + result.Data.Rows[i].StyleName + "</td><td> " + result.Data.Rows[i].FilePath + "</td><td> " + TimeChange(result.Data.Rows[i].CreateTime) + '</td></tr>'
+
+                        }
+                        tablelist += '</tbody></table>';
+                        document.getElementById('fileList').innerHTML = tablelist;
+                        $("#page").paging({
+                            pageNum: 1, // 当前页面
+                            totalNum: Math.ceil(result.Data.Total / 10), // 总页码
+                            totalList: result.Data.Total, // 记录总数量
+                            callback: function (num) { //回调函数
+                                // console.log(num);
+                                queryForm.pageIndex = num;
+                                list(queryForm)
+
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                },
+            });
+    }
+    function list(queryForm) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getFileList',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    if (result.Data.Rows !== null) {
+                        let tablelist = '<table class="" style="width:700px;margin:0 auto;" width="700" ><tbody>';
+                        tablelist += '<th align="center">序号</th><th align="center">文件名</th><th align="center">款名</th><th align="center">路径</th><th align="center">时间</th>'
+                        for (let i = 0; i < result.Data.Rows.length; i++) {
+                            tablelist += '<tr style="height:45px;"><td>' + (i + 1) + '</td>' + '<td><a class="detail" name="' + result.Data.Rows[i].StyleName + '" id="' + result.Data.Rows[i].Id + '" tabIndex="' + i + '"  onclick="OpenFile(this)">' + result.Data.Rows[i].FileName + '</a></td>' + "<td> " + result.Data.Rows[i].StyleName + "</td><td> " + result.Data.Rows[i].FilePath + "</td><td> " + TimeChange(result.Data.Rows[i].CreateTime) + '</td></tr>'
+                        }
+                        tablelist += '</tbody></table>';
+                        document.getElementById('fileList').innerHTML = tablelist;
+                    } else {
+                        return false;
+                    }
+                },
+            });
+    }
+</script>
+
+</html>

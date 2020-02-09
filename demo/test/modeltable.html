@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Model</title>
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css"> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script> -->
+    <!-- <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<style>
+    .model-table {
+        text-align: center;
+        margin-top: 80px;
+    }
+
+    .table-list {
+        display: table;
+        margin: 0 auto;
+        margin-top: 30px;
+    }
+</style>
+
+<body>
+    <div class="model-table">
+        版单名称：
+        <input type="text"> 版单ID:
+        <input type="text">
+        <button value="">搜索</button>
+        <div class="table-list">
+            <table width="700" border="1">
+                <tr>
+                    <th align="left">ID</th>
+                    <th align="right">名称</th>
+                 
+                    <th align="right">操作</th>
+                </tr>
+                <tr>
+                    <td align="left">1</td>
+                    <td align="right">衣服</td>
+                   
+                    <td align="right">
+                        <a>详细</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">2</td>
+                    <td align="right">裤子</td>
+                   
+                    <td align="right">
+                        <a>详细</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">3</td>
+                    <td align="right">上衣</td>
+                    
+                    <td align="right">
+                        <a>详细</a>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+        <!-- <button onclick="crossDomainRequest()">点击</button> -->
+    </div>
+
+    <body>
+
+        <div id="content"></div>
+
+        <script type="text/javascript">
+            // $(function () {
+            function crossDomainRequest() {
+                // console.log('1111111')
+                // headers = new HttpHeaders({'Access-Control-Allow-Origin' : '*'})
+                $.ajax({
+                    url: "http://192.168.3.184/bmapi/demo/getBandan",//json文件位置
+                    type: "GET",//请求方式为get
+                    dataType: "json", //返回数据格式为json
+                    success: function (data) {//请求成功完成后要执行的方法 
+                        //each循环 使用$.each方法遍历返回的数据date
+                        // console.log(data)
+                        // $.each(data.first, function (i, item) {
+                        //     var str = '<div>姓名:' + item.name + '性别：' + item.sex + '</div>';
+                        //     document.write(str);
+                        // })
+                    }
+                })
+            }
+
+            // })
+            // function createXHR(){
+            //     return window.XMLHttpRequest?
+            //     new XMLHttpRequest():
+            //     new ActiveXObject("Microsoft.XMLHTTP");
+            // }
+            // function getappkey(url){
+            //     xmlHttp = createXHR();
+            //     xmlHttp.open("GET",url,false);
+            //     xmlHttp.send();
+            //     result = xmlHttp.responseText;
+            //     console.log(result)
+            //     return result;
+            // }
+            // function crossDomainRequest(){
+            //     var content =getappkey('http://192.168.3.184:8531/demo/getBandan');
+            //     document.getElementById("content").innerHTML=content;
+            // }
+        </script>
+    </body>
+
+</html>

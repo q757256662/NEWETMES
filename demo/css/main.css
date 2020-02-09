@@ -1,0 +1,171 @@
+h2 {
+  border-top: solid cornflowerblue 1px;
+  border-left: solid cornflowerblue 1px;
+  /* width: 50px; */
+  height: 25px;
+  margin: 0;
+  float: left;
+  text-align: center;
+  border-right: solid cornflowerblue 1px;
+  box-shadow: 1px 0px 11px #5e6565;
+  /* border-radius: 3px */
+}
+
+.tab-content {
+  /* border: solid cornflowerblue 1px; */
+  min-width: 400px;
+  min-height: 150px;
+}
+
+.tab-content div{
+  display: none;
+}
+
+.selected {
+  background-color: cornflowerblue;
+}
+
+.tab-content .show{
+  display: block;
+}
+
+.main{
+  min-width:800px;
+  margin:0 auto;
+  width: 800px;
+}
+
+.show{
+  text-align: center;
+}
+
+.clearfloat:after{display:block;clear:both;content:"";visibility:hidden;height:0}
+
+.clearfloat{zoom:1}
+
+* {
+  font-family: Tahoma, Arial, Serif;
+  font-size: 14;
+}
+
+body {
+  text-align: center;
+  min-width: 760px;
+  background: rgb(258, 250, 240, 0.1)
+}
+
+#main {
+  width: 720px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+p {
+  /* border-bottom: dotted 1px #e63; */
+  font-size: 24px;
+  font-family: Arial;
+  font-weight: bold;
+}
+
+/* 设置表格样式 */
+table {
+  text-align: center;
+  border: 1px #4682b4;
+  width: 80%;
+  background-color: #4682b4;
+  border-radius: 1px;
+}
+
+th {
+  background-color: #6495ed;
+  cursor: pointer;
+  color: White;
+  height: 30px;
+  padding:0 10px;
+}
+
+/* 配上单元格样式以后，表格呈现出细线的边框 */
+td {
+  background-color: #fff;
+  padding: 4px;
+}
+
+/* 深蓝色（鼠标经过） */
+.activecol {
+  background-color: #005eae;
+}
+
+.tb{
+  width: 100%;
+  height: 100%;
+}
+
+.border_outer{
+  min-width: 800px;
+  margin:0 auto;
+}
+
+   /* 外面盒子样式---自己定义 */
+
+   .page_div {
+    margin: 20px 10px 20px 0;
+    color: #666
+}
+
+/* 页数按钮样式 */
+
+.page_div button {
+    display: inline-block;
+    min-width: 30px;
+    height: 28px;
+    cursor: pointer;
+    color: #666;
+    font-size: 13px;
+    line-height: 28px;
+    background-color: #f9f9f9;
+    border: 1px solid #dce0e0;
+    text-align: center;
+    margin: 0 4px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+#firstPage,
+#lastPage,
+#nextPage,
+#prePage {
+    width: 50px;
+    color: #0073A9;
+    border: 1px solid #0073A9
+}
+
+#nextPage,
+#prePage {
+    width: 70px
+}
+
+.page_div .current {
+    background-color: #0073A9;
+    border-color: #0073A9;
+    color: #FFF
+}
+
+/* 页面数量 */
+
+.totalPages {
+    margin: 0 10px
+}
+
+.totalPages span,
+.totalSize span {
+    color: #0073A9;
+    margin: 0 5px
+}
+
+/*button禁用*/
+
+.page_div button:disabled {
+    opacity: .5;
+    cursor: no-drop
+}

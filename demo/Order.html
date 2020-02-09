@@ -1,0 +1,463 @@
+<!-- 生产单列表或者生产单搜索页面，使得使用着可以选择一个生产单；如果用户的管理系统是web模式的，此页面本来就存在，只是要稍加修改。
+此页面约定的页面名称：Order.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/ajax.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+    <title>Order</title>
+</head>
+<style>
+        .head-logo {
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .head-logo .logo {
+        /* left: -308px; */
+        position: relative;
+        height: 50px;
+    }
+
+    .herder-user {
+        position: relative;
+        left: 300px;
+        border: 0px solid;
+        border-radius: 50px;
+        width: 60px;
+        height: 60px;
+    }
+    .head-href{
+    left: -308px;
+    position: relative;
+    display: inline-block;
+    }
+    .head-logo .user-text {
+        position: relative;
+        left: 302px;
+        top: -25px;
+        text-decoration: none
+    }
+    .head-logo:hover{
+        cursor: pointer;
+    }
+    .model-table {
+        /* text-align: center; */
+        /* margin-top: 30px; */
+    }
+
+  .search-title {
+        font-size: 23px;
+        line-height: 36px;
+        height: 36px;
+    }
+    .search-title input{
+        height: 25px;
+    font-size: 18px;
+    }
+    .search-title button {
+        width: 50px;
+    height: 30px;
+    line-height: 27px;
+
+    }
+
+    .table-list {
+        display: table;
+        margin: 0 auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .page a {
+        border: 1px solid gray;
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        line-height: 30px;
+    }
+
+    .page span {
+        margin-right: 15px;
+    }
+
+    .page a:hover {
+        border: 1px solid #38f;
+        color: #38f;
+
+    }
+
+    .bandan-title {
+        text-align: center;
+    }
+
+    .detail {
+        margin: 8px;
+
+    }
+
+    .detail {
+        text-decoration: none;
+        color: blue;
+    }
+
+    .detail:hover {
+        /* color: #38f; */
+        cursor: pointer;
+
+    }
+
+    #table_sizes th {
+        width: 90px;
+    }
+
+    .fileList {
+        margin-top: 15px;
+        display: -webkit-inline-box;
+    }
+
+    .img img {
+        width: 800px;
+        margin-top: 30px;
+    }
+    .footer{
+        margin-top: 20px;
+    }
+</style>
+<style>
+</style>
+
+<body onload="initTwoArr()">
+        <div class="head-logo">
+            <a  class="head-href" href="http://www.etsystem.cn/" target="blank">
+                    <img class="logo" src="img/logo.png" alt="">
+            </a>
+               
+                <img class="herder-user" src="img/user.png" alt="">
+                <a class="user-text">测试用户</a>
+            </div>
+    <div class="search" id="search" style="display: block">
+        <div class="model-table">
+            <div class="search-title">
+                生产单名称：
+                <!-- <input type="text"> 版单ID: -->
+                <input id="query" type="text">
+                <button  onclick="handleSearch()">搜索</button>
+            </div>
+            <div class="table-list" id="table-list">
+            </div>
+            <div id="page1" class="page_div"></div>
+            <!-- <button onclick="crossDomainRequest()">点击</button> -->
+        </div>
+        <!-- <div class="fileList" id="fileList">
+
+        </div>
+        <div id="page" class="page_div"></div> -->
+    </div>
+    <div class="href-html">
+        <a href="Model.html">跳转版单</a>
+        <a href="File.html?fileType=SCD">跳转文件列表</a>
+        <!-- <a href="File.html">跳转文件列表</a> -->
+    </div>
+ 
+    <div class="footer">
+            <!--页脚-->
+                      <footer>
+                              <strong>Copyright 2019
+                                      <a href="http://www.etsystem.cn/" target="blank">©深圳布易科技有限公司</a>
+                                      All Rights Reserved.
+                                      <!-- <img src="static/img/logo-blank.png" style="padding:10px"> -->
+                              </strong>
+                      </footer>
+                  </div>
+</body>
+<script type="text/javascript">
+
+    var json = '';
+    var number = 1;
+    var queryForm ={
+       query: '',
+       pageIndex: 1,
+       pageSize: 10,
+       token:token
+    };
+    //main函数
+    function initTwoArr() {
+        GetToken();
+        detail();
+        getlist(queryForm);
+      
+    }
+    //window.external. GetToken	 获得用户身份
+    function GetToken() {
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1111, 900);
+        } else {
+            mes = window.buyiGetToken(1111, 900);
+        }
+    }
+    //查询
+    function handleSearch(){
+       let qurey = document.getElementById('query').value;
+        if(qurey.replace(/\s+/g, "") == ''){
+             alert('请输入查询条件！')
+        }else{
+            queryForm.query = qurey;
+            getlist(queryForm);
+        }
+    }
+    //获取数据
+    function getlist(queryForm) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiGetOrder',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    json = result.Data.Rows;
+                    // showTable();
+                    if(result.Data.Rows != null ){
+                        showTableList(result.Data)
+                    }else{
+                        return false;
+                    }
+                   
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+
+
+ 
+  
+
+    //表格列表数据
+    function showTableList(obj) {
+        // console.log(obj)
+        let table = '<table class="" style="width:700px" width="700" ><tbody>';
+        table += '<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+        for (let i = 0; i < obj.Rows.length; i++) {
+
+            table += '<tr style="height:45px;"><td>' + obj.Rows[i].id + '</td>' + '<td >' + obj.Rows[i].name + '</td>' + '<td><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '"  href="OrderDetail.html?id=' + obj.Rows[i].id + '&fileid=0"> ' + '详细' + '</a><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '" tabIndex="' + i + '"  onclick="CreatFile(this)">' + '新建' + '</a></td></tr>'
+
+
+        }
+        table += '</tbody></table>';
+        document.getElementById('table-list').innerHTML = table;
+        $("#page1").paging({
+            pageNum: 1, // 当前页面
+            totalNum: Math.ceil(obj.Total / 10), // 总页码
+            totalList: obj.Total, // 记录总数量
+            callback: function (num) { //回调函数
+                // console.log(num);
+                queryForm.pageIndex = num;
+                shwolist(queryForm);
+            }
+        });
+    }
+    //分页数据更新
+    function shwolist(queryForm) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiGetOrder',
+                type: "GET",
+                dataType: "json",
+                data:queryForm,
+                success: function (result) {
+                    // console.log(result);
+                    let obj = result.Data;
+                    let table = '<table class="" style="width:700px" width="700" ><tbody>';
+                    table += '<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+                    for (let i = 0; i < obj.Rows.length; i++) {
+
+                        table += '<tr style="height:45px;"><td>' + obj.Rows[i].id + '</td>' + '<td >' + obj.Rows[i].name + '</td>' + '<td><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '"  href="ModeleDetail.html?id=' + obj.Rows[i].id + '&fileid=0"> ' + '详细' + '</a><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '" tabIndex="' + i + '"  onclick="CreatFile(this)">' + '新建' + '</a></td></tr>'
+
+
+                    }
+                    table += '</tbody></table>';
+                    document.getElementById('table-list').innerHTML = table;
+
+                },
+            });
+    }
+    //详情
+    function detail(e) {
+        if (GetUrlParam("id") !== "" && GetUrlParam("fileid") !== "") {
+            window.location.href = "OrderDetail.html?id=" + GetUrlParam("id") + "&fileid=" + GetUrlParam("fileid");
+        }
+        if (GetUrlParam("projectID") !== "" )
+         {
+            window.location.href = "OrderDetail.html?id=" + GetUrlParam("projectID") ;
+        }
+
+    }
+    //是订单查询还是详细信息
+    function showTable() {
+        if (GetUrlParam("id") != "" && GetUrlParam("fileid") != "") {
+            document.getElementById('search').style.display = "none";
+      
+        } else {
+            document.getElementById('search').style.display = "block";
+          
+        }
+    }
+    //OpenFile 文件列表
+    function OpenFile() {
+        //   console.log(arguments)
+        getOpenInfo(arguments[0].id, arguments[0].name, arguments[0].tabIndex);
+    }
+    function getOpenInfo(id, name, index){
+        
+                    let form = {};
+                    form.mode = 'create';
+                    form.projectName = name;
+                    form.projectID = id;
+                    form.fileID = 0;
+                    form.filePath = '';
+                    form.fileName = '';
+                    GetCreatFtpInfo(form, index);
+    }
+    //CreatFile 
+    function CreatFile() {
+        //    console.log(arguments)
+        getFileID(arguments[0].id, arguments[0].name, arguments[0].tabIndex);
+    }
+    //获取文件id
+    function getFileID(id, name, index) {
+        // $.ajax(
+        //     {
+        //         url: requestUrl + '/bmapi/demo/savaFilePara',
+        //         type: "POST",
+        //         dataType: "json",
+        //         data: {
+        //             fileId: 0,
+        //             isUP: 0,
+        //             projectID: id,
+        //             fileName: '',
+        //             fileType:'SCD'  
+        //         },
+        //         success: function (result) {
+        //             console.log(result)
+                    let form = {};
+                    form.mode = 'create';
+                    form.projectName = name;
+                    form.projectID = id;
+                    form.fileID = 0;
+                    form.filePath = '';
+                    form.fileName = '';
+                    form.token=token;
+                    GetCreatFtpInfo(form, index);
+
+
+        //         },
+        //         error: function (xhr, status, p3, p4) {
+        //             var err = "Error " + " " + status + " " + p3;
+        //             if (xhr.responseText && xhr.responseText[0] == "{")
+        //                 err = JSON.parse(xhr.responseText).message;
+        //             alert(err);
+        //         }
+        //     });
+    }
+    // 获取ftp新建参数
+    function GetCreatFtpInfo(form, index) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/createftp',
+                type: "POST",
+                dataType: "json",
+                data: form,
+                success: function (result) {
+                    // alert(JSON.stringify(result));
+                    //  string openFile (string type, string data，string file);
+                    if(bowserExplorer == 'ie'){
+                    var state = window.external.openFile('order', JSON.stringify(json[index]), JSON.stringify(result.Data));
+                    if (state == 'OK') {
+                        window.external.closeDialog(0);
+                        //锁定版单或者生产单 buyiLockModel --- ModelId 
+                        $.ajax(
+                            {
+                                url: requestUrl + '/bmapi/demo/buyiLockOrder',
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    OrderId: form.projectID,
+                                    token:token
+                                },
+                                success: function (result) {
+                                    // console.log(result);
+                                },
+                                error: function (xhr, status, p3, p4) {
+                                    var err = "Error " + " " + status + " " + p3;
+                                    if (xhr.responseText && xhr.responseText[0] == "{")
+                                        err = JSON.parse(xhr.responseText).message;
+                                    alert(err);
+                                }
+                            });
+                    } else {
+                        alert(state);
+                    }
+                    }else{
+                        var state = window.buyiOpenFile('order', JSON.stringify(json[index]), JSON.stringify(result.Data));
+                    if (state == 'OK') {
+                        window.buyiCloseDialog(0);
+                        //锁定版单或者生产单 buyiLockModel --- ModelId 
+                        $.ajax(
+                            {
+                                url: requestUrl + '/bmapi/demo/buyiLockOrder',
+                                type: "POST",
+                                dataType: "json",
+                                data: {
+                                    ModelId: form.projectID,
+                                    token:token
+                                },
+                                success: function (result) {
+                                    // console.log(result);
+                                },
+                                error: function (xhr, status, p3, p4) {
+                                    var err = "Error " + " " + status + " " + p3;
+                                    if (xhr.responseText && xhr.responseText[0] == "{")
+                                        err = JSON.parse(xhr.responseText).message;
+                                    alert(err);
+                                }
+                            });
+                    } else {
+                        alert(state);
+                    }
+                    }
+                  
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    // 设置鼠标经过表头样式 
+    function setActiveCol(activeCol) {
+        activeCol.className = "activecol";
+    }
+
+    function setLoseFocusCol(col) {
+        col.className = "";
+    }
+</script>
+
+</html>

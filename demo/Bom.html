@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="./css/main.css">
+	<script src="./js/md5.js"></script>
+	<script src="./js/main.js"></script>
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	<script src="./js/utils.js"></script>
+	<script src="./js/pageMe.js"></script>
+	<title>BOM</title>
+</head>
+<style>
+	.model-table {
+		text-align: center;
+		/* margin-top: 80px; */
+	}
+
+	.submit-button button {
+		width: 200px;
+		height: 30px;
+		font-size: 18px;
+		font-weight: 800;
+	}
+
+	.table-list {
+		display: table;
+		margin: 0 auto;
+		margin-top: 30px;
+	}
+
+	.tab-content {
+		/* width: 800px; */
+	}
+</style>
+
+<body onload="init();initTwoArr()">
+	<div class="search" style="display: block">
+		<h3 class="bandan-title">版单信息</h2>
+			<div class="model-table">
+
+				<div class="table-list" id="table-list">
+
+				</div>
+
+			</div>
+	</div>
+
+	<div class="main">
+		<h3 class="bandan-title">用料信息</h2>
+			<div class="tab-head clearfloat">
+				
+			</div>
+			<div class="tab-content">
+				<!-- <div class="show " id="table_sizes">
+				</div> -->
+				<div class="show" id="table_fabric">
+				</div>
+				<!-- <div>content3</div> -->
+			</div>
+			<p class="submit-button">
+				<button onclick="handleSubmint()">上传</button>
+			</p>
+
+	</div>
+</body>
+<script type="text/javascript">
+	//------------以下是对二维数组的初始化与显示操作---------- 
+	var json = '';
+	//main函数
+	function initTwoArr() {
+		GetToken();
+		showTableList(JSON.parse(json));
+		forTableOne(JSON.parse(json));
+	}
+	//window.external. GetToken	 获得用户身份
+	// bowserExplorer  判断ie或者谷歌浏览器
+    function GetToken() {
+		if (bowserExplorer == 'ie') {
+			mes = window.external.GetToken(1111, 900);
+			json = window.external.getData();
+        } else {
+			mes = window.buyiGetToken(1111, 900);
+			json = window.buyiGetData();
+        }
+        // alert(mes);返回值是mac;
+    }
+	//格式化表格
+	function forTableTwo(obj) {
+		var table = '<table class="tb" cellpadding="1" cellspacing="1"><thead><tr><th></th>';
+		for (let i = 0; i < obj.size_name.name.length; i++) {
+			table += '<th onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.size_name.name[i] + '</th>'
+		}
+		table += '</tr></thead><tbody>';
+		for (let i = 0; i < obj.size.length; i++) {
+			table += '<tr><th  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.size[i].name + '</th>'
+			for (let j = 0; j < obj.size[i].measures.length; j++) {
+				table += '<td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" id=' + i + '-' + j + '>' + obj.size[i].measures[j] + '</td>'
+			}
+			table += '</tr>'
+		}
+		table += '</tbody></table>'
+		// document.getElementById('main').innerHTML(table)
+		document.getElementById('table_sizes').innerHTML = table;
+
+	}
+	//初始化表格
+	function forTableOne(obj) {
+		let table = ''
+		// console.log(obj);
+		table += '<table class="tb" cellpadding="1" cellspacing="1" style="margin-bottom:30px"><thead><tr >';
+		let arr = [];
+		for (let str in obj.fabric[0]) {
+			// console.log(obj.version.fabric[0]);
+			table += '<th  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + str + '</th>'
+			arr.push(str)
+		}
+		table += '</tr></thead><tbody>';
+		// console.log(arr)
+		for (let i = 0; i < obj.fabric.length; i++) {
+
+			table += '<tr>'
+			table += '<td >' + obj.fabric[i].id + '</td>' + '<td >' + obj.fabric[i].name + '</td>' + '<td >' + obj.fabric[i].width + '</td>' + '<td >' + obj.fabric[i].details + '</td>' + '<td >' + obj.fabric[i].len_shrinkage + '</td>' + '<td >' + obj.fabric[i].width_shrinkage + '</td>' + '<td >' + obj.fabric[i].price + '</td>' + '<td >' + obj.fabric[i].amount + '</td>'
+
+			table += '</tr>'
+
+		}
+		table += '</tbody></table>';
+		document.getElementById('table_fabric').innerHTML = table;
+	}
+	//表格列表数据
+	function showTableList(obj) {
+		let table = '<table class="" style="width:800px;margin-bottom:35px;" width="800" ><tbody>';
+		// table+=;
+		// for(let i=0;i<obj.version.fabric.length;i++){
+		//   table +='<tr>'+'ID'+'</tr>'+'<tr>'+'名称' 
+		//   for(let str in obj.version.fabric[0]){
+		// table += '<td  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.id+'</td>'+ '<td  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.style+'</td>'
+		//   }
+		//   table+='</tr>'
+
+		// }
+		table += '<th align="center">ID</th><th align="center">名称</th>'
+		table += '<tr><td>' + obj.id + '</td>' + '<td >' + obj.name + '</tr>'
+		table += '</tbody></table>';
+		document.getElementById('table-list').innerHTML = table;
+	}
+
+	// 上传
+	function handleSubmint() {
+		$.ajax(
+			{
+				url: requestUrl + '/bmapi/demo/buyiPostBom',
+				type: "POST",
+				dataType: "json",
+				data: {
+					bom: JSON.stringify(json),
+					token:token
+				},
+				success: function (result) {
+					if (result.Success == true) {
+						if (bowserExplorer == 'ie'){
+							window.external.closeDialog(0);
+						}else{
+							window.buyiCloseDialog(0);
+						}
+					} else {
+						alert(result.ErrMes);
+					}
+				},
+				error: function (xhr, status, p3, p4) {
+					var err = "Error " + " " + status + " " + p3;
+					if (xhr.responseText && xhr.responseText[0] == "{")
+						err = JSON.parse(xhr.responseText).message;
+					alert(err);
+				}
+			});
+	}
+
+	// 设置鼠标经过表头样式 
+	function setActiveCol(activeCol) {
+		activeCol.className = "activecol";
+	}
+
+	function setLoseFocusCol(col) {
+		col.className = "";
+	}
+</script>
+
+</html>

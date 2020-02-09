@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/main.css">
+  <script src="./js/main.js"></script>
+  <script src="./js/utils.js"></script>
+  <title>Order</title>
+</head>
+<style>
+	.model-table {
+			text-align: left;
+			margin-top: 80px;
+	}
+
+	.table-list {
+			display: table;
+			margin: 0 auto;
+			margin-top: 30px;
+            margin-bottom: 30px;
+	}
+</style>
+<body onload="init();initTwoArr()">
+	<div class="border_outer">
+		<div class="search" style="display: block">
+			<div class="model-table">
+				生产单名称：
+				<input type="text"> 生产单ID:
+				<input type="text">
+				<button value="">搜索</button>
+				<div class="table-list" id="table-list">
+						<!-- <table width="700" border="1">
+								<tr>
+										<th align="left">ID</th>
+										<th align="right">名称</th>
+								 
+										<th align="right">操作</th>
+								</tr>
+								<tr>
+										<td align="left">1</td>
+										<td align="right">衣服</td>
+									 
+										<td align="right">
+												<a>详细</a>
+										</td>
+								</tr>
+								<tr>
+										<td align="left">2</td>
+										<td align="right">裤子</td>
+									 
+										<td align="right">
+												<a>详细</a>
+										</td>
+								</tr>
+								<tr>
+										<td align="left">3</td>
+										<td align="right">上衣</td>
+										
+										<td align="right">
+												<a>详细</a>
+										</td>
+								</tr>
+	
+						</table> -->
+				</div>
+	
+				<!-- <button onclick="crossDomainRequest()">点击</button> -->
+		</div>
+		</div>
+		<div class="main">
+				<div class="tab-head clearfloat">
+						<h2 class="selected">尺码</h2>
+						<h2>物料</h2>
+						<!-- <h2>3</h2> -->
+				</div>
+				<div class="tab-content">
+						<div class="show " id="table_sizes">
+						</div>
+						<div id="table_fabric">
+						</div>
+						<!-- <div>content3</div> -->
+				</div>
+		</div>
+	</div>
+  
+</body onload="init();initTwoArr()"> 
+<script type="text/javascript">
+  //------------以下是对二维数组的初始化与显示操作---------- 
+  var json = `
+  {
+	"id" : "BD123",
+	"style" : "buyi",
+	"sizes" : { 
+		"type" : "cm",
+		"unit" : "cm",
+		"size_name" : { 
+			"base" : "M",
+			"name" : [ 
+				"S",
+				"M",
+				"L" 
+			] 
+		},
+		"parts" : [ 
+			 { 
+				"name" : "胸围",
+				"tolerance" : 0.000,
+				"measures" : [ 
+					-2.000,
+					0.000,
+					2.000 
+				] 
+			},
+			 { 
+				"name" : "衣长",
+				"tolerance" : 0.000,
+				"measures" : [ 
+					-3.000,
+					0.000,
+					3.000 
+				] 
+			},
+			 { 
+				"name" : "腰围",
+				"tolerance" : 0.000,
+				"measures" : [ 
+					-1.000,
+					0.000,
+					1.000 
+				] 
+			},
+			 { 
+				"name" : "领围",
+				"tolerance" : 0.000,
+				"measures" : [ 
+					-1.000,
+					0.000,
+					1.000 
+				] 
+			} 
+		] 
+	},
+	"version" : { 
+		"name" : "白色",
+		"fabric" : [ 
+			 { 
+				"id" : "ZM-173553",
+				"name" : "主面料",
+				"width" : 156.000,
+				"details" : "蓝色牛仔",
+				"len_shrinkage" : 0.000,
+				"width_shrinkage" : 0.000,
+				"price" : 30.000,
+				"amount" : 0.000 
+			},
+			 { 
+				"id" : "LM-173533",
+				"name" : "里料",
+				"width" : 160.000,
+				"details" : "白棉布",
+				"len_shrinkage" : 0.000,
+				"width_shrinkage" : 0.000,
+				"price" : 20.000,
+				"amount" : 0.000 
+			} 
+		],
+		"quantity" : [ 
+			1,
+			1,
+			1 
+		] 
+	}
+}`;
+json = JSON.parse(json)
+//main函数
+function initTwoArr() {
+    forTableTwo(json)
+    forTableOne(json)
+    showTableList(json)
+    // showTwoArrOnTable();
+  }
+  //格式化表格
+  function forTableTwo(obj){
+    var table = '<table class="tb" cellpadding="1" cellspacing="1"><thead><tr><th></th>';
+    for(let i = 0;i<obj.sizes.size_name.name.length;i++){
+      table+='<th onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.sizes.size_name.name[i]+'</th>'
+    }
+    table+='</tr></thead><tbody>';
+    for(let i = 0;i<obj.sizes.parts.length;i++){
+      table+='<tr><th  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.sizes.parts[i].name+'</th>'
+      for(let j=0;j<obj.sizes.parts[i].measures.length;j++){
+        table+='<td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" id='+i+'-'+j+'>'+obj.sizes.parts[i].measures[j]+'</td>'
+      }
+      table+='</tr>'
+    }
+    table+='</tbody></table>'
+    // document.getElementById('main').innerHTML(table)
+    document.getElementById('table_sizes').innerHTML = table;
+
+  }
+  //初始化表格
+  function forTableOne(obj){
+    let table = '<table class="tb" cellpadding="1" cellspacing="1"><thead><tr>';
+    let arr = [];
+    console.log(obj)
+    for(let str in obj.version.fabric[0]){
+      // console.log(obj.version.fabric[0]);
+      table+='<th onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+str+'</th>'
+      arr.push(str)
+    }
+    // console.log(arr)
+    table+='</tr></thead><tbody>';
+    for(let i=0;i<obj.version.fabric.length;i++){
+      table +='<tr>'
+      for(let str in obj.version.fabric[0]){
+        table += '<td  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.version.fabric[i][str]+'</td>'
+      }
+      table+='</tr>'
+    }
+    table+='</tbody></table>';
+    document.getElementById('table_fabric').innerHTML = table;
+  }
+  //表格列表数据
+  function showTableList(obj){
+    let table = '<table class="" style="width:800px" width="700" ><tbody>';
+    // table+=;
+    // for(let i=0;i<obj.version.fabric.length;i++){
+    //   table +='<tr>'+'ID'+'</tr>'+'<tr>'+'名称' 
+    //   for(let str in obj.version.fabric[0]){
+        // table += '<td  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.id+'</td>'+ '<td  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">'+obj.style+'</td>'
+    //   }
+    //   table+='</tr>'
+
+    // }
+    table+='<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+    table+='<tr><td>'+obj.id+'</td>'+ '<td >'+obj.style+'</td>'+'<td>'+'详细'+'</td></tr>'
+    table+='</tbody></table>';
+    document.getElementById('table-list').innerHTML = table;
+  }
+
+  // 设置鼠标经过表头样式 
+  function setActiveCol(activeCol) {
+    activeCol.className = "activecol";
+  }
+
+  function setLoseFocusCol(col) {
+    col.className = "";
+  }
+</script>
+</html>

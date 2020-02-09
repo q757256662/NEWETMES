@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+    <title>TDDetail</title>
+</head>
+<style>
+       .model-table {
+        /* text-align: center; */
+        margin-top: 80px;
+    }
+
+    .search-title {}
+
+    .table-list {
+        display: table;
+        margin: 0 auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .page a {
+        border: 1px solid gray;
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        line-height: 30px;
+    }
+
+    .page span {
+        margin-right: 15px;
+    }
+
+    .page a:hover {
+        border: 1px solid #38f;
+        color: #38f;
+
+    }
+
+    .bandan-title {
+        text-align: center;
+    }
+
+     .detail {
+        margin: 8px;
+
+    }
+    .detail {
+        text-decoration:none;
+        color: blue;
+    }
+
+    .detail:hover {
+        /* color: #38f; */
+        cursor: pointer;
+
+    }
+
+    #table_sizes th {
+        width: 90px;
+    }
+
+    .img img {
+        width: 800px;
+        margin-top: 30px;
+    }
+</style>
+<body onload="init();initTwoArr()">
+
+     
+
+    <div class="main" id="main">
+        <h3 class="bandan-title">详细信息</h2>
+            <!-- <h3 class="bandan-title">物料信息</h2> -->
+               
+                    <div class="model-table">
+        
+                        <div class="table-list" id="table-list">
+        
+                        </div>
+        
+                        <!-- <button onclick="crossDomainRequest()">点击</button> -->
+                    </div>
+            <div class="tab-head clearfloat">
+                    <!-- <h2 class="selected">团订订单详情</h2> -->
+					<h2 class="selected">物料信息</h2>
+					<h2>量体信息</h2>
+                <!-- <a style="  float: right;" href="Model.html">返回版单列表</a> -->
+                <button onclick="GotoTD()" style="  float: right;">返回团订列表</button>               
+                <button onclick="updateModel()" style="  float: right;margin-right:8px;">刷新团订单信息</button>
+            </div>
+
+            <div class="tab-content">
+					<!-- <div class="show " id="TDOrder">
+                    </div> -->
+                   
+					<div  class="show " id="table_fabric">
+					</div>
+					<div id="person"></div>
+				</div>
+            <div class="img">
+                <img src="img/demo-img.png" alt="" srcset="">
+            </div>
+    </div>
+    <div class="href-html">
+        <a href="Model.html">跳转生产单</a>
+    </div>
+</body>
+<script>
+    var json = '';
+    var number = 1;
+    //main函数
+    // alert(window.location)
+    function initTwoArr() {
+        // GetUrlParam("id") == "" && GetUrlParam("fileid") == ""
+        GetToken();
+        getlist(number);
+        // showTable();
+
+    }
+    //window.external. GetToken	 获得用户身份
+    function GetToken() {
+        let mes = '';
+     
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1000, 700);
+        }else{
+            mes = window.buyiGetToken(1000, 700);
+        }
+        // alert(mes);返回值是mac;
+
+    }
+        function getlist(num) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiGetTd',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    query: '',
+                    pageIndex: num,
+                    pageSize: 10
+                },
+                success: function (result) {
+                //  console.log(result);
+                 if (result.Data.Rows != null) {
+                    for(i=0;i<result.Data.Rows.length;i++){
+                    //    console.log(result.Data.Rows[i].order)
+                        if(result.Data.Rows[i].order.orderID ==GetUrlParam('id') ){
+                            json = result.Data.Rows[i];
+                        }
+                   };
+                    forTableOne(json);
+                    initTDOrder(json)
+                    initPerson(json)
+                    } else {
+                        return false;
+                    }
+               
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+   	//初始化表格
+		function initTDOrder(obj) {
+			let table = '<table><thead><tr>';
+			for (let str in obj.order) {
+				table += '<th>' + str + '</th>'
+			}
+			table += '</tr></thead><tbody><tr>'
+			for (let str in obj.order) {
+				table += '<td>' + obj.order[str] + '</td>'
+			}
+			table += '</tr></tbody></table>'
+			document.getElementById('table-list').innerHTML = table;
+
+		}
+    //格式化表格
+		function forTableTwo(obj) {
+            var table = '<table class="tb" cellpadding="1" cellspacing="1"><thead><tr><th></th>';
+                // console.log(obj.measureName.length)
+                
+			for (let i = 0; i < obj.measureName.length; i++) {
+				table += '<th onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.measureName[i] + '</th>'
+			}
+			table += '</tr></thead><tbody>';
+			// for (let i = 0; i < obj.sizes.parts.length; i++) {
+			// 	table += '<tr><th  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.sizes.parts[i].name + '</th>'
+			// 	for (let j = 0; j < obj.sizes.parts[i].measures.length; j++) {
+			// 		table += '<td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" id=' + i + '-' + j + '>' + obj.sizes.parts[i].measures[j] + '</td>'
+			// 	}
+			// 	table += '</tr>'
+            // }
+            table += '</tr>'
+			table += '</tbody></table>'
+			// document.getElementById('main').innerHTML(table)
+			document.getElementById('table_sizes').innerHTML = table;
+
+		}
+		//初始化表格
+		function forTableOne(obj) {
+			let table = '<table class="tb"  cellpadding="1" cellspacing="1"><thead><tr>';
+			let arr = [];
+			// console.log(obj)
+			for (let str in obj.fabric[0]) {
+				// console.log(obj.version.fabric[0]);
+				table += '<th>' + str + '</th>'
+				arr.push(str)
+			}
+			// console.log(arr)
+			table += '</tr></thead><tbody>';
+			for (let i = 0; i < obj.fabric.length; i++) {
+				// table += '<tr>'
+				table += '<tr>'
+				for (let str in obj.fabric[0]) {
+					table += '<td>' + obj.fabric[i][str] + '</td>'
+				}
+				table += '</tr>'
+			}
+			table += '</tbody></table>';
+			// console.log(table)
+			document.getElementById('table_fabric').innerHTML = table;
+        }
+        	//初始化物料表
+		function initFabric(obj) {
+			let table = '<table class="tb" cellpadding="1" cellspacing="1" style="margin-bottom:30px"><thead><tr>';
+			for (let str in obj.fabric[0]) {
+				table += '<th>' + str + '</th>'
+			}
+			table += '</tr></thead><tbody>'
+			for (let i = 0; i < obj.fabric.length; i++) {
+				// table+='<tr><th>'+obj.fabric[i].name+'</th>'
+				for (let str in obj.fabric[i]) {
+					table += '<td>' + obj.fabric[i][str] + '</td>'
+				}
+				table += '</tr>'
+			}
+			table += '</tbody></table>'
+			document.getElementById('table_fabric').innerHTML = table;
+		}
+		//初始化量体信息表
+		function initPerson(obj) {
+			let table = '<table class="tb" cellpadding="1" cellspacing="1" style="margin-bottom:30px"><thead><tr><th></th>';
+			for (let str in obj.person[0]) {
+				if (str == 'meaValue') {
+					for (let meaValue in obj.measureName) {
+						table += '<th>' + obj['measureName'][meaValue] + '</th>'
+					}
+				} else {
+					table += '<th>' + str + '</th>'
+				}
+			}
+			table += '</tr></thead><tbody>'
+			for (let i = 0; i < obj.person.length; i++) {
+				table += '<tr><th>' + obj.person[i].name + '</th>'
+				for (let str in obj.person[i]) {
+					if (str != 'meaValue') {
+						table += '<td>' + obj.person[i][str] + '</td>'
+					} else {
+						for (let k in obj.person[i]['meaValue']) {
+							table += '<td>' + obj['person'][i]['meaValue'][k] + '</td>'
+						}
+					}
+				}
+				table += '</tr>'
+			}
+			table += '</tbody></table>'
+			document.getElementById('person').innerHTML = table;
+		}
+    function  GotoTD(){
+         window.location = "TD.html";
+    }
+      //刷新版单信息 调用setData
+      function updateModel() {
+        //   alert(JSON.stringify(json))
+        if (bowserExplorer == 'ie') {
+        var state = window.external.setData('td', JSON.stringify(json));
+        alert(state)
+        if (state == 'OK') {
+            window.external.closeDialog(0);
+
+        } else {
+            alert(state);
+        }
+        }else{
+            var state = window.buyiSetData('td', JSON.stringify(json));
+        alert(state)
+        if (state == 'OK') {
+            window.buyiCloseDialog(0);
+
+        } else {
+            alert(state);
+        }
+        }
+      
+    }
+       // 设置鼠标经过表头样式 
+       function setActiveCol(activeCol) {
+        activeCol.className = "activecol";
+    }
+
+    function setLoseFocusCol(col) {
+        col.className = "";
+    }
+</script>
+</html>

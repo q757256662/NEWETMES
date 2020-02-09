@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<!-- 将某个款式的纸样文件上传到FTP服务器进行保存时，打开此页面，供用户填写文件名和其他信息。并可显示错误信息
+此页面约定的页面名称：SaveFile.html -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link rel="stylesheet" href="./css/main.css"> -->
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/ajax.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+    <title>SaveMoelFile</title>
+</head>
+<style>
+    .head-logo {
+        margin-top: 10px;
+        /* margin-bottom: 30px; */
+    }
+
+    .head-href {
+        left: -308px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .head-logo .logo {
+        /* left: -308px; */
+        position: relative;
+        height: 50px;
+    }
+
+    .herder-user {
+        position: relative;
+        left: 300px;
+        border: 0px solid;
+        border-radius: 50px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .head-logo .user-text {
+        position: relative;
+        left: 302px;
+        top: -25px;
+        text-decoration: none
+    }
+
+    .head-logo:hover {
+        cursor: pointer;
+    }
+
+    .SaveMoelFile {
+
+        height: 500px;
+        margin: 0 auto;
+        text-align: center;
+
+        background-color: rgb(258, 250, 240, 0.1);
+    }
+
+    .search-title {
+        font-size: 23px;
+        line-height: 36px;
+        height: 36px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .search-title input {
+        height: 25px;
+        font-size: 18px;
+    }
+
+    .search-title button {
+        width: 50px;
+        height: 30px;
+        line-height: 27px;
+
+    }
+
+    #main {
+        display: inline-block;
+        margin-left: 88px;
+    }
+
+    #main table {
+        margin-bottom: 5px;
+        width: 570px;
+        margin: 0 auto;
+        border-spacing: 0;
+    }
+
+    .detail {
+        margin: 8px;
+
+    }
+
+    .detail {
+        text-decoration: none;
+        color: #0B7FFF;
+    }
+
+    .detail:hover {
+        cursor: pointer;
+
+    }
+
+    #main table tr {
+        height: 45px;
+
+    }
+
+    .footer {
+        margin-top: 40px;
+    }
+
+    .fileList table {}
+
+    .el-table__body {
+        table-layout: fixed;
+        border-collapse: separate;
+    }
+
+    .el-table thead {
+        font-weight: 550;
+    }
+
+    .el-table td:first-child {
+        width: 280px;
+        padding: 12px 0;
+        min-width: 0;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        position: relative;
+        text-align: left;
+    }
+
+    .is-leaf {
+        font-weight: 600;
+    }
+
+    .el-table td,
+    .el-table th.is-leaf {
+        border-bottom: 1px solid #ECEEF1;
+    }
+
+    .el-table table thead :first-child th {
+        border-top: 3px solid #EEF0F2;
+        border-bottom: 3px solid #EEF0F2;
+    }
+
+    .el-table td,
+    .el-table th {
+        padding: 12px 0;
+        min-width: 0;
+    }
+
+    .footer {
+        text-align: center;
+    }
+</style>
+
+<body onload="init()">
+
+    <div class="SaveMoelFile">
+        <div class="head-logo">
+            <a class="head-href" href="http://www.etsystem.cn/" target="blank">
+                <img class="logo" src="img/logo.png" alt="">
+            </a>
+            <img class="herder-user" src="img/user.png" alt="">
+            <a class="user-text">测试用户</a>
+        </div>
+        <div>
+            <p style="font-size:20px;font-weight:600;">文件上传</p>
+            <div class="search-title">
+                <!-- 文件名称/款名： -->
+                <!-- <input type="text"> 版单ID: -->
+                <input id="fileName" type="text" placeholder="请输入文件名称">
+                <button onclick="SubmitSvae()">保存</button>
+                <div id="main">
+
+                </div>
+            </div>
+
+            <div class="fileList el-table" id="fileList">
+
+            </div>
+        </div>
+        <div class="footer">
+            <!--页脚-->
+            <footer>
+                <strong>Copyright 2019
+                    <a href="http://www.etsystem.cn/" target="blank">©深圳布易科技有限公司</a>
+                    All Rights Reserved.
+                    <!-- <img src="static/img/logo-blank.png" style="padding:10px"> -->
+                </strong>
+            </footer>
+        </div>
+    </div>
+
+</body>
+<script>
+    var SavefileID = '';//保存文件时的id
+    var SavePath = "";
+    var SaveName = '';
+    var queryForm = {
+        projectID: '',
+        query: '',
+        pageIndex: 1,
+        pageSize: 10,
+        token: token,
+        fileType: ''
+    }
+
+    function init() {
+        queryForm.projectID = GetUrlParam("id");
+        GetToken();
+        showTable();
+        fileList(queryForm);
+    }
+    function GetToken() {
+        let mes = '';
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1111, 700);
+        } else {
+            mes = window.buyiGetToken(1111, 700);
+        }
+        // alert(mes);返回值是mac;
+    }
+
+    //展示
+    function ShowSaveMoelFile(e) {
+        let obj = e;
+        let str = "<span>" + '款名：' + obj.StyleName + "</span>" + "<span style='font-size: 16px;margin-left: 50px;'>" + '路径：' + obj.FilePath + "</span>"
+        document.getElementById('main').innerHTML = str;
+    }
+    function cancelSubmint() {
+        if (bowserExplorer == 'ie') {
+            window.external.closeDialog(1);
+        } else {
+            window.buyiCloseDialog(1);
+        }
+
+    }
+    //文件列表显示
+    function fileList(queryForm) {
+
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getFileList',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    // console.log(result);
+                    if (result.Success) {
+                        if (result.Data.Rows !== null) {
+                            let tablelist = '<table  cellspacing="0" cellpadding="0" border="0" class="el-table__body" style="width:700px;margin:0 auto;" width="700" ><tbody><thead>';
+                            tablelist += '<tr><th class="is-leaf"  align="left">文件名</th><th align="center" class="is-leaf" >时间</th></tr></thead>'
+                            for (let i = 0; i < result.Data.Rows.length; i++) {
+                                tablelist += '<tr style="height:45px;">' + '<td ><a class="detail"  id="' + result.Data.Rows[i].Id + '" tabIndex="' + i + '" >' + result.Data.Rows[i].FileName + '</a></td>' + "<td> " + TimeChange(result.Data.Rows[i].CreateTime) + '</td></tr>'
+                            }
+                            tablelist += '</tbody></table>';
+                            document.getElementById('fileList').innerHTML = tablelist;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        alert(result.ErrMes);
+                    }
+
+                },
+            });
+    }
+    //是订单查询还是详细信息
+    function showTable() {
+        //id 版单id或者生产单id;  fileid 文件id
+
+        var fileId = '';
+        var projectID = '';
+        if (GetUrlParam("id") != "") {
+            projectID = GetUrlParam("id");
+        } if (GetUrlParam("fileid") != "") {
+            fileId = GetUrlParam("fileid");
+        } else if (GetUrlParam("fileid") == "") {
+            fileId = 0;
+        }
+
+        // if (projectID != "" && fileId != "") {
+        //获取新保存文件信息
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getFileinfobyId',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    fileId: fileId,
+                    projectID: projectID,
+                    token: token
+                },
+                success: function (result) {
+
+                    SavefileID = result.Data.FileId;
+                    SavePath = result.Data.FilePath;
+                    SaveName = result.Data.FileName;
+                    document.getElementById('fileName').value = SaveName;
+                    json = result.Data;
+                    ShowSaveMoelFile(json);
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+        document.getElementById('main').style.display = "inline-block";
+        // }
+        //  else {
+        //     document.getElementById('main').style.display = "none";
+        // }
+    }
+    // 获取upload参数
+    function GetUploadFtpInfo(form) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/uploadftp',
+                type: "POST",
+                dataType: "json",
+                data: form,
+                success: function (result) {
+                    if (bowserExplorer == 'ie') {
+                        var state = window.external.saveFile(JSON.stringify(result.Data));
+                        if (state == 'OK') {
+                            $.ajax(
+                                {
+                                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        fileId: form.fileID,
+                                        isUP: 1,
+                                        fileName: form.fileName,
+                                        fileType: 'BD',
+                                        projectID: form.projectID,
+                                        token: token
+                                    },
+                                    success: function (result) {
+
+                                    },
+                                    error: function (xhr, status, p3, p4) {
+                                        var err = "Error " + " " + status + " " + p3;
+                                        if (xhr.responseText && xhr.responseText[0] == "{")
+                                            err = JSON.parse(xhr.responseText).message;
+                                        alert(err);
+                                    }
+                                });
+                            window.external.closeDialog(0);
+                        } else {
+                            deleteFile(form.fileID);
+                            alert(state);
+                           
+                        }
+                    } else {
+                        var state = window.buyiSaveFile(JSON.stringify(result.Data));
+                        if (state == 'OK') {
+                            $.ajax(
+                                {
+                                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        fileId: form.fileID,
+                                        isUP: 1,
+                                        fileName: form.fileName,
+                                        fileType: 'BD',
+                                        projectID: form.projectID,
+                                        token: token
+                                    },
+                                    success: function (result) {
+
+                                    },
+                                    error: function (xhr, status, p3, p4) {
+                                        var err = "Error " + " " + status + " " + p3;
+                                        if (xhr.responseText && xhr.responseText[0] == "{")
+                                            err = JSON.parse(xhr.responseText).message;
+                                        alert(err);
+                                    }
+                                });
+                            window.buyiCloseDialog(0);
+                        } else {
+                            deleteFile(form.fileID);
+                            alert(state);
+                        }
+                    }
+
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    //上传失败调用
+    function deleteFile(fileID) {
+        var data = {};
+        data.fileID = fileID;
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/delefailfile',
+                type: "delete",
+                dataType: "json",
+                data: data,
+                success: function (result) {
+                        //  alert(JSON.stringify(result));
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    //保存
+    function SubmitSvae() {
+        let filename = document.getElementById('fileName').value;
+        //fileID=0 新保存 页面上拿过来的
+        if (filename.replace(/\s+/g, "") == '') {
+            alert('请输入文件名！');
+            return false;
+        }
+        if (SavefileID == 0) {
+            $.ajax(
+                {
+                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        fileId: GetUrlParam("fileid"),//url上拿过来的id
+                        projectID: GetUrlParam("id"),//url上拿过来的fileid
+                        isUP: 0,
+                        fileName: filename,
+                        fileType: 'BD',
+                        token: token
+                    },
+                    success: function (result) {
+                        let form = {};
+                        form.projectID = GetUrlParam("id");//url上拿过来的fileid
+                        form.fileID = result.Data.FileId;
+                        form.filePath = result.Data.Path;
+                        form.fileName = filename;
+                        form.token = token;
+                        GetUploadFtpInfo(form);
+
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).message;
+                        alert(err);
+                    }
+                });
+        }
+        else {
+            if (filename.replace(/\s+/g, "") == SaveName) {
+                let form = {};
+                form.projectID = GetUrlParam("id");//url上拿过来的fileid
+                form.fileID = SavefileID;
+                form.filePath = SavePath;
+                form.fileName = filename;
+                form.token = token;
+                GetUploadFtpInfo(form);
+            } else {
+                $.ajax(
+                    {
+                        url: requestUrl + '/bmapi/demo/savaFilePara',
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            fileId: GetUrlParam("fileid"),//url上拿过来的id
+                            projectID: GetUrlParam("id"),//url上拿过来的fileid
+                            isUP: 1,
+                            fileName: filename,
+                            fileType: 'BD',
+                            token: token
+                        },
+                        success: function (result) {
+                            let form = {};
+                            form.projectID = GetUrlParam("id");//url上拿过来的fileid
+                            form.fileID = result.Data.FileId;
+                            form.filePath = result.Data.Path;
+                            form.fileName = filename;
+                            form.token = token;
+                            GetUploadFtpInfo(form);
+
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).message;
+                            alert(err);
+                        }
+                    });
+            }
+
+        }
+    }
+
+</script>
+
+</html>

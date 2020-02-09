@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<!-- 将某个TD文件上传到FTP服务器进行保存时，打开此页面，供用户填写文件名和其他信息。并可显示错误信息
+此页面约定的页面名称：SaveTDFile.html -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link rel="stylesheet" href="./css/main.css"> -->
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <!-- <script src="./js/ajax.js"></script> -->
+    <script src="./js/utils.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <title>SaveTDFile</title>
+</head>
+<style>
+    .SaveMoelFile {
+        border: 1px solid gray;
+        width: 700px;
+        height: 500px;
+        margin: 0 auto;
+        text-align: center;
+        margin-top: 35px;
+        background-color: rgb(258, 250, 240, 0.1);
+    }
+
+    .input-name {
+        margin-bottom: 18px;
+        font-size: 20px;
+        padding: 5px 11px 0 0px;
+    }
+
+    #fileName {
+        height: 25px;
+        font-size: 18px;
+        padding: 5px;
+    }
+
+    .input-name button {
+        width: 80px;
+        font-size: 15px;
+        font-weight: 600;
+        height: 35px;
+    }
+
+    #main table {
+        margin-bottom: 35px;
+        width: 400px;
+        margin: 0 auto;
+        /* border: 1px solid gray; */
+        border-spacing: 0;
+    }
+
+    #main table tr {
+        height: 75px;
+        ;
+        /* width: 200px; */
+    }
+
+    #main table td {
+        width: 200px;
+    }
+</style>
+
+<body onload="init()">
+    <div class="SaveMoelFile">
+        <div style="margin-top:64px;">
+            <p style="font-size:20px;">保存信息</p>
+            <div class="input-name">
+                文件名：
+                <input id="fileName" type="text">
+                <button onclick="cancelSubmint()">取消</button>
+                <button onclick="SubmitSvae()">保存</button>
+            </div>
+
+            <div id="main">
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+<script>
+    var SavefileID = '';//保存文件时的id
+    function init() {
+        showTable();
+        GetToken();
+        // console.log(ajax(option))
+      
+    }
+    function GetToken() {
+        let mes = '';
+     
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1000, 750);
+        } else {
+            mes = window.buyiGetToken(1000, 750);
+        }
+        // alert(mes);返回值是mac;
+
+    }
+    function  cancelSubmint(){
+        if(bowserExplorer == 'ie'){
+            window.external.closeDialog(1);
+        }else{
+            window.buyiCloseDialog(1);
+        }
+      
+  }
+    //展示
+    function ShowSaveMoelFile(e) {
+        console.log(e);
+        // let obj = JSON.parse(e)
+        let obj = e;
+        let table = '<table  class="" style="margin-bottom:35px;font-size: 18px;opacity: 0.8;" ><tbody>';
+        // table += '<th align="center">ID</th>'
+        table += '<tr  align="left" ><td>' + '文件名' + '</td><td>' + obj.FileName + '</td></tr><tr  align="left"><td>' + '路径' + '</td><td>' + obj.FilePath + '</td></tr><tr  align="left"><td>' + '款名' + '</td><td>' + obj.StyleName + '</td></tr><tr><td>'
+        table += '</tbody></table>';
+        document.getElementById('fileName').value = obj.FileName;
+        document.getElementById('main').innerHTML = table;
+    }
+    //展示
+
+    //是订单查询还是详细信息
+    function showTable() {
+        // alert(window.location);
+        //id 版单id或者生产单id;  fileid 文件id
+        if (GetUrlParam("id") != "" && GetUrlParam("fileid") != "") {
+            // document.getElementById('search').style.display = "none";
+            //获取新保存文件信息
+                $.ajax(
+                    {
+                        url: requestUrl + '/bmapi/demo/getFileinfobyId',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            fileId: GetUrlParam("fileid"),
+                            projectID:GetUrlParam("id")
+                        },
+                        success: function (result) {
+                            SavefileID = result.Data.FileId;
+                            json = result.Data;
+                            ShowSaveMoelFile(json);
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).message;
+                            alert(err);
+                        }
+                    });
+            document.getElementById('main').style.display = "block";
+        } else {
+            // document.getElementById('search').style.display = "block";
+            document.getElementById('main').style.display = "none";
+        }
+    }
+// 获取upload参数
+function  GetUploadFtpInfo(form){
+     form.token=token;
+    $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/uploadftp',
+                type: "POST",
+                dataType: "json",
+                data: form,
+                success: function (result) {
+                    // console.log(json)
+                //  string openFile (string type, string data，string file);
+            
+                // alert(JSON.stringify(result.Data));
+                if(bowserExplorer == 'ie'){
+                    var state =  window.external.saveFile(JSON.stringify(result.Data));
+                if(state == 'OK'){
+                    $.ajax(
+                {
+                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        fileId: form.fileID,
+                        isUP: 1,
+                        fileName: form.fileName,
+                        fileType:'TD',
+                        projectID: form.projectID,
+                        token:token   
+                    },
+                    success: function (result) {
+                        
+                        // console.log(result);
+                     
+                       
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).message;
+                        alert(err);
+                    }
+                });
+                    window.external.closeDialog (0);
+
+                }else{
+                    alert(state);
+                }
+                }else{
+                    var state =  window.buyiSaveFile(JSON.stringify(result.Data));
+                if(state == 'OK'){
+                    $.ajax(
+                {
+                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        fileId: form.fileID,
+                        isUP: 1,
+                        fileName: form.fileName,
+                        fileType:'TD',
+                        projectID: form.projectID,
+                        token:token   
+                    },
+                    success: function (result) {
+                        
+                        // console.log(result);
+                     
+                       
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).message;
+                        alert(err);
+                    }
+                });
+                    window.buyiCloseDialog (0);
+
+                }else{
+                    alert(state);
+                }
+                }
+             
+                   
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    //保存
+    function SubmitSvae() {
+        let filename = document.getElementById('fileName').value;
+        //fileID=0 新保存 页面上拿过来的
+        if (filename.replace(/\s+/g, "") == '') {
+            alert('请输入文件名！');
+            return false;
+        }
+        if(SavefileID == 0){
+            $.ajax(
+                {
+                    url: requestUrl + '/bmapi/demo/savaFilePara',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        fileId:  GetUrlParam("fileid"),//url上拿过来的id
+                        projectID: GetUrlParam("id"),//url上拿过来的fileid
+                        isUP: 0,
+                        fileName: filename,
+                        fileType:'TD', 
+                        token:token 
+                    },
+                    success: function (result) {
+                       let form ={};
+                        // form.projectName = '';
+                        form.projectID = GetUrlParam("id");//url上拿过来的fileid
+                        form.fileID = result.Data.FileId;
+                        form.filePath = result.Data.filePath;
+                        form.fileName = filename;
+                        // alert(JSON.stringify(form))
+                        GetUploadFtpInfo(form);
+                       
+                    },
+                    error: function (xhr, status, p3, p4) {
+                        var err = "Error " + " " + status + " " + p3;
+                        if (xhr.responseText && xhr.responseText[0] == "{")
+                            err = JSON.parse(xhr.responseText).message;
+                        alert(err);
+                    }
+                });
+                }
+   
+
+    }
+  
+</script>
+
+</html>

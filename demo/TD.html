@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<!-- 显示团订订单的列表页面，没有团订业务的客户可以不实现此页面
+此页面约定的页面名称：TD.html -->
+
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<script src="./js/md5.js"></script>
+	<link rel="stylesheet" href="./css/main.css">
+	<script src="./js/main.js"></script>
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	<script src="./js/utils.js"></script>
+	<script src="./js/pageMe.js"></script>
+	<title>TD</title>
+</head>
+<style>
+	.model-table {
+		text-align: center;
+		/* margin-top: 80px; */
+	}
+
+	.head-logo {
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .head-logo .logo {
+        /* left: -308px; */
+        position: relative;
+        height: 50px;
+    }
+
+    .herder-user {
+        position: relative;
+        left: 300px;
+        border: 0px solid;
+        border-radius: 50px;
+        width: 60px;
+        height: 60px;
+    }
+    .head-href{
+    left: -308px;
+    position: relative;
+    display: inline-block;
+    }
+    .head-logo .user-text {
+        position: relative;
+        left: 302px;
+        top: -25px;
+        text-decoration: none
+    }
+    .head-logo:hover{
+        cursor: pointer;
+    }
+
+	.submit-button button {
+		width: 200px;
+		height: 30px;
+		font-size: 18px;
+		font-weight: 800;
+	}
+
+	.table-list {
+		display: table;
+		margin: 0 auto;
+		margin-top: 30px;
+		margin-bottom: 30px;
+	}
+
+	#table_fabric table {
+		width: 1000px;
+		height: 100%;
+		margin: 0 auto;
+	}
+
+	.detail {
+		margin: 8px;
+
+	}
+
+	.detail {
+		text-decoration: none;
+		color: blue;
+	}
+
+	.detail:hover {
+		/* color: #38f; */
+		cursor: pointer;
+
+	}
+</style>
+<style>
+	.model-table {
+		/* text-align: center; */
+		/* margin-top: 80px; */
+	}
+
+	.search-title {
+		font-size: 23px;
+		line-height: 36px;
+		height: 36px;
+	}
+
+	.search-title input {
+		height: 25px;
+		font-size: 18px;
+	}
+
+	.search-title button {
+		width: 50px;
+		height: 30px;
+		line-height: 27px;
+
+	}
+
+	.table-list {
+		display: table;
+		margin: 0 auto;
+		margin-top: 30px;
+		margin-bottom: 30px;
+	}
+
+	.page a {
+		border: 1px solid gray;
+		width: 30px;
+		height: 30px;
+		display: inline-grid;
+		line-height: 30px;
+	}
+
+	.page span {
+		margin-right: 15px;
+	}
+
+	.page a:hover {
+		border: 1px solid #38f;
+		color: #38f;
+
+	}
+
+	.bandan-title {
+		text-align: center;
+	}
+
+
+
+	#table_sizes th {
+		width: 90px;
+	}
+	.footer{
+        margin-top: 20px;
+    }
+</style>
+
+<body onload="initTwoArr()">
+		<div class="head-logo">
+				<a class="head-href" href="http://www.etsystem.cn/" target="blank">
+					<img class="logo" src="img/logo.png" alt="">
+				</a>
+		
+				<img class="herder-user" src="img/user.png" alt="">
+				<a class="user-text">测试用户</a>
+			</div>
+	<div class="search" style="display: block">
+		<h3 class="bandan-title">团订订单信息</h2>
+			<div class="model-table">
+				<div class="search-title">
+					团订订单名称：
+					<!-- <input type="text"> 版单ID: -->
+					<input id="query" type="text">
+					<button onclick="handleSearch()">搜索</button>
+				</div>
+				<div class="table-list" id="table-list">
+
+				</div>
+
+				<!-- <button onclick="crossDomainRequest()">点击</button> -->
+			</div>
+			<div id="page" class="page_div"></div>
+	</div>
+	
+
+	<div class="footer">
+            <!--页脚-->
+                      <footer>
+                              <strong>Copyright 2019
+                                      <a href="http://www.etsystem.cn/" target="blank">©深圳布易科技有限公司</a>
+                                      All Rights Reserved.
+                                      <!-- <img src="static/img/logo-blank.png" style="padding:10px"> -->
+                              </strong>
+                      </footer>
+                  </div>
+	<!-- 显示团订订单的列表页面，没有团订业务的客户可以不实现此页面
+此页面约定的页面名称：TD.html -->
+
+</body>
+<script type="text/javascript">
+
+	var json = '';//传递的json数据
+	var queryForm = {
+		query: '',
+		pageIndex: 1,
+		pageSize: 10,
+		token:token
+	}
+	//main函数
+	function initTwoArr() {
+		GetToken();
+		detail();
+		getTdlist(queryForm);
+	}
+	//window.external. GetToken	 获得用户身份
+	function GetToken() {
+		let mes = '';
+		if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1111, 900);
+        } else {
+            mes = window.buyiGetToken(1111, 900);
+        }
+
+		// alert(mes);//返回值是mac;
+
+	}
+	// 设置鼠标经过表头样式 
+	function setActiveCol(activeCol) {
+		activeCol.className = "activecol";
+	}
+
+	function setLoseFocusCol(col) {
+		col.className = "";
+	}
+	//查询
+	function handleSearch() {
+		let qurey = document.getElementById('query').value;
+		if (qurey.replace(/\s+/g, "") == '') {
+			alert('请输入查询条件！')
+		} else {
+			queryForm.query = qurey;
+			getTdlist(queryForm);
+		}
+	}
+	//获取团订数据
+	function getTdlist(queryForm) {
+		$.ajax(
+			{
+				url: requestUrl + '/bmapi/demo/buyiGetTd',
+				type: "GET",
+				dataType: "json",
+				data: queryForm,
+				success: function (result) {
+					json = result.Data.Rows;//赋值传递的json数据
+					if(result.Data.Rows != null ){
+						showTableList(result.Data);
+                    }else{
+                        return false;
+                    }
+				
+				},
+				error: function (xhr, status, p3, p4) {
+					var err = "Error " + " " + status + " " + p3;
+					if (xhr.responseText && xhr.responseText[0] == "{")
+						err = JSON.parse(xhr.responseText).message;
+					alert(err);
+				}
+			});
+	}
+    //列表显示
+	function showTableList(obj) {
+		// console.log(obj)
+		let table = '<table class="" style="width:700px" width="700" ><tbody>';
+		table += '<th align="center">款名</th><th align="center">名称</th><th align="center">订单名称</th><th align="center">衣服类型</th><th align="center">件数</th><th align="center">客户名</th><th align="center">操作</th>'
+		for (let i = 0; i < obj.Rows.length; i++) {
+			table += '<tr style="height:45px;"><td>' + obj.Rows[i].order.modelName + '</td>' + '<td >' + obj.Rows[i].order.style + '</td>' + '<td >' + obj.Rows[i].order.orderName + '</td>' + '<td >' + obj.Rows[i].order.subName + '</td>' + '<td >' + obj.Rows[i].order.clothes + '</td>' + '<td >' + obj.Rows[i].order.customerName + '</td>' + '<td><a class="detail" name="' + obj.Rows[i].order.orderName + '" id="' + obj.Rows[i].order.orderID + '" tabIndex="' + i + '"  onclick="CreatFile(this)">' + '处理' + '</a></td></tr>'
+		}
+		// table+='<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+		// table+='<tr><td>'+obj.id+'</td>'+ '<td >'+obj.style+'</td>'+'<td>'+'详细'+'</td></tr>'
+		table += '</tbody></table>';
+		document.getElementById('table-list').innerHTML = table;
+		//分页在这里显示
+		$("#page").paging({
+			pageNum: 1, // 当前页面
+			totalNum: Math.ceil(obj.Total / 10), // 总页码
+			totalList: obj.Total, // 记录总数量
+			callback: function (num) { //回调函数
+				// console.log(num);
+				queryForm.pageIndex = num;
+				showTdlist(queryForm)
+			}
+		});
+	}
+	//更新分页数据
+	function showTdlist(queryForm) {
+		$.ajax(
+			{
+				url: requestUrl + '/bmapi/demo/buyiGetTd',
+				type: "GET",
+				dataType: "json",
+				data: queryForm,
+				success: function (result) {
+					// console.log(result)
+					json = result.Data.Rows;
+					if(result.Data.Rows != null ){
+						showTableList(result.Data);
+                    }else{
+                        return false;
+                    }
+				},
+				error: function (xhr, status, p3, p4) {
+					var err = "Error " + " " + status + " " + p3;
+					if (xhr.responseText && xhr.responseText[0] == "{")
+						err = JSON.parse(xhr.responseText).message;
+					alert(err);
+				}
+			});
+	}
+	//CreatFile 
+	function CreatFile() {
+		getFileID(arguments[0].id, arguments[0].name, arguments[0].tabIndex);
+	}
+	//直接更新数据setdata
+	function getFileID(id, name, index) {
+
+		if(bowserExplorer == 'ie'){
+			var state = window.external.setData('td', JSON.stringify(json[index]));
+		if (state == 'OK') {
+			window.external.closeDialog(0);
+
+		} else {
+			alert(state);
+		}
+		}else{
+			var state = window.buyiSetData('td', JSON.stringify(json[index]));
+		if (state == 'OK') {
+			window.buyiCloseDialog(0);
+
+		} else {
+			alert(state);
+		}
+		}
+
+	
+
+	}
+	// 获取ftp新建参数此处团订不需要
+	function GetCreatFtpInfo(form, index) {
+			form.token= token;
+		$.ajax(
+			{
+				url: requestUrl + '/bmapi/demo/createftp',
+				type: "POST",
+				dataType: "json",
+				data: form,
+				success: function (result) {
+					//  string openFile (string type, string data，string file);
+					if (bowserExplorer == 'ie') {
+						var state = window.external.openFile('td', JSON.stringify(json[index]), JSON.stringify(result.Data));
+					if (state == 'OK') {
+						window.external.closeDialog(0);
+						//锁定版单或者生产单 buyiLockModel --- ModelId 
+						$.ajax(
+							{
+								url: requestUrl + '/bmapi/demo/buyiLockTd',
+								type: "POST",
+								dataType: "json",
+								data: {
+									ModelId: form.projectID,
+									token:token
+								},
+								success: function (result) {
+									// console.log(result);
+								},
+								error: function (xhr, status, p3, p4) {
+									var err = "Error " + " " + status + " " + p3;
+									if (xhr.responseText && xhr.responseText[0] == "{")
+										err = JSON.parse(xhr.responseText).message;
+									alert(err);
+								}
+							});
+					} else {
+						alert(state);
+					}
+					}else{
+						var state = window.OpenFile('td', JSON.stringify(json[index]), JSON.stringify(result.Data));
+					if (state == 'OK') {
+						window.buyiCloseDialog(0);
+						//锁定版单或者生产单 buyiLockModel --- ModelId 
+						$.ajax(
+							{
+								url: requestUrl + '/bmapi/demo/buyiLockTd',
+								type: "POST",
+								dataType: "json",
+								data: {
+									ModelId: form.projectID,
+									token:token
+								},
+								success: function (result) {
+									// console.log(result);
+								},
+								error: function (xhr, status, p3, p4) {
+									var err = "Error " + " " + status + " " + p3;
+									if (xhr.responseText && xhr.responseText[0] == "{")
+										err = JSON.parse(xhr.responseText).message;
+									alert(err);
+								}
+							});
+					} else {
+						alert(state);
+					}
+					}
+				
+
+
+				},
+				error: function (xhr, status, p3, p4) {
+					var err = "Error " + " " + status + " " + p3;
+					if (xhr.responseText && xhr.responseText[0] == "{")
+						err = JSON.parse(xhr.responseText).message;
+					alert(err);
+				}
+			});
+	}
+	//详细
+	function detail(e) {
+		if (GetUrlParam("id") !== "" && GetUrlParam("fileid") !== "") {
+			window.location.href = "TDDetail.html?id=" + GetUrlParam("id") + "&fileid=" + GetUrlParam("fileid");
+			// window.location.href += '?id=1&fileid=1'
+			// document.getElementById('search').style.display = "none";
+			// document.getElementById('main').style.display = "block";
+		}
+
+	}
+</script>
+
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/ajax.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+    <title>Model</title>
+</head>
+<style>
+    .head-logo {
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+
+    .head-logo .logo {
+        /* left: -308px; */
+        position: relative;
+        height: 50px;
+    }
+
+    .herder-user {
+        position: relative;
+        left: 300px;
+        border: 0px solid;
+        border-radius: 50px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .head-href {
+        left: -308px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .head-logo .user-text {
+        position: relative;
+        left: 302px;
+        top: -25px;
+        text-decoration: none
+    }
+
+    .head-logo:hover {
+        cursor: pointer;
+    }
+
+    .model-table {
+        /* text-align: center; */
+        /* margin-top: 80px; */
+    }
+
+    .search-title {
+        font-size: 23px;
+        line-height: 36px;
+        height: 36px;
+    }
+
+    .search-title input {
+        height: 25px;
+        font-size: 18px;
+    }
+
+    .search-title button {
+        width: 50px;
+        height: 30px;
+        line-height: 27px;
+
+    }
+
+    .table-list {
+        display: table;
+        margin: 0 auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .page a {
+        border: 1px solid gray;
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        line-height: 30px;
+    }
+
+    .page span {
+        margin-right: 15px;
+    }
+
+    .page a:hover {
+        border: 1px solid #38f;
+        color: #38f;
+
+    }
+
+    .bandan-title {
+        text-align: center;
+    }
+
+    .detail {
+        margin: 8px;
+
+    }
+
+    .detail {
+        text-decoration: none;
+        color: blue;
+    }
+
+    .detail:hover {
+        /* color: #38f; */
+        cursor: pointer;
+
+    }
+
+    #table_sizes th {
+        width: 90px;
+    }
+
+    .img img {
+        width: 800px;
+        margin-top: 30px;
+    }
+
+    .footer {
+        margin-top: 20px;
+    }
+</style>
+
+<body onload="initTwoArr();">
+    <div class="head-logo">
+        <a class="head-href" href="http://www.etsystem.cn/" target="blank">
+            <img class="logo" src="img/logo.png" alt="">
+        </a>
+
+        <img class="herder-user" src="img/user.png" alt="">
+        <a class="user-text">测试用户</a>
+    </div>
+    <div class="search" id="search" style="display: block">
+        <div class="model-table">
+            <div class="search-title">
+                版单名称：
+                <!-- <input type="text"> 版单ID: -->
+                <input id="query" type="text">
+                <button onclick="handleSearch()">搜索</button>
+            </div>
+
+            <div class="table-list" id="table-list">
+
+            </div>
+            <div id="page" class="page_div"></div>
+
+
+
+        </div>
+    </div>
+
+    <div class="href-html">
+        <a href="Order.html">跳转生产单</a>
+        <!-- <a href="TD.html">跳转团订订单</a> -->
+        <a href="File.html?fileType=BD">跳转文件列表</a>
+    </div>
+    <div class="footer">
+        <!--页脚-->
+        <footer>
+            <strong>Copyright 2019
+                <a href="http://www.etsystem.cn/" target="blank">©深圳布易科技有限公司</a>
+                All Rights Reserved.
+                <!-- <img src="static/img/logo-blank.png" style="padding:10px"> -->
+            </strong>
+        </footer>
+    </div>
+</body>
+<script type="text/javascript">
+    //------------以下是对二维数组的初始化与显示操作---------- 
+    var json = '';
+    var number = 1;
+    // var  list = '';
+    var queryForm = {
+        query: '',
+        pageIndex: 1,
+        pageSize: 10,
+        token: token
+    };
+    // 页面初始化加载函数
+    $(document).ready(function () {
+      
+        GetToken();
+        detail();
+        getlist(queryForm);
+
+    });
+
+    //onload函数
+    function initTwoArr() {
+        // GetToken();
+        // detail();
+        // getlist(queryForm);
+    }
+    //window.external. GetToken	 获得用户身份
+    // bowserExplorer  判断ie或者谷歌浏览器
+    function GetToken() {
+        var mes = '';
+        if (bowserExplorer == 'ie') {
+            mes = window.external.GetToken(1111, 900);
+        } else {
+            mes = window.buyiGetToken(1111, 900);
+        }
+
+        // alert(mes);返回值是mac;
+    }
+
+    //查询
+    function handleSearch() {
+        var qurey = document.getElementById('query').value;
+        if (qurey.replace(/\s+/g, "") == '') {
+            alert('请输入查询条件！')
+        } else {
+            queryForm.query = qurey;
+            getlist(queryForm);
+        }
+    }
+    //获取列表数据
+    function getlist(queryForm) {
+
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiGetModel',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    // console.log(result)
+                    json = result.Data.Rows;
+                    obj = result.Data;
+                    if (result.Data.Rows != null) {
+
+                        showTableList(result.Data);
+                    } else {
+                        return false;
+                    }
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+
+    //表格列表数据
+    function showTableList(obj) {
+        // console.log(obj)
+        var table = '<table class="" style="width:700px" width="700" ><tbody>';
+        table += '<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+        for (var i = 0; i < obj.Rows.length; i++) {
+            table += '<tr style="height:45px;"><td>' + obj.Rows[i].id + '</td>' + '<td >' + obj.Rows[i].name + '</td>' + '<td><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '"  href="ModeleDetail.html?id=' + obj.Rows[i].id + '&fileid=0"> ' + '详细' + '</a><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '" tabIndex="' + i + '"  onclick="CreatFile(this)">' + '新建' + '</a></td></tr>'
+        }
+        table += '</tbody></table>';
+        document.getElementById('table-list').innerHTML = table;
+        $("#page").paging({
+            pageNum: 1, // 当前页面
+            totalNum: Math.ceil(obj.Total / 10), // 总页码
+            totalList: obj.Total, // 记录总数量
+            callback: function (num) { //回调函数
+                // console.log(num);
+                queryForm.pageIndex = num;
+                list(queryForm);
+            }
+        });
+    }
+    //分页数据更新
+    function list(queryForm) {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiGetModel',
+                type: "GET",
+                dataType: "json",
+                data: queryForm,
+                success: function (result) {
+                    // console.log(result);
+                    var obj = result.Data
+                    var table = '<table class="" style="width:700px" width="700" ><tbody>';
+                    table += '<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+                    for (var i = 0; i < obj.Rows.length; i++) {
+
+                        table += '<tr style="height:45px;"><td>' + obj.Rows[i].id + '</td>' + '<td >' + obj.Rows[i].name + '</td>' + '<td><a class="detail" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '" href="ModeleDetail.html?id="' + obj.Rows[i].id + '"+"&fileid=0&index="+' + i + '> ' + '详细' + '</a><a class="detail" tabIndex="' + i + '" name="' + obj.Rows[i].name + '" id="' + obj.Rows[i].id + '" onclick="CreatFile(this)">' + '新建' + '</a></td></tr>'
+
+                    }
+                    // table+='<th align="center">ID</th><th align="center">名称</th><th align="center">操作</th>'
+                    // table+='<tr><td>'+obj.id+'</td>'+ '<td >'+obj.style+'</td>'+'<td>'+'详细'+'</td></tr>'
+                    table += '</tbody></table>';
+                    document.getElementById('table-list').innerHTML = table;
+
+                },
+            });
+    }
+    //详情
+    function detail(e) {
+        if (GetUrlParam("id") !== "" || GetUrlParam("fileid") !== "")
+         {
+            window.location.href = "ModeleDetail.html?id=" + GetUrlParam("id") + "&fileid=" + GetUrlParam("fileid");
+        }
+        if (GetUrlParam("projectID") !== "" )
+         {
+            window.location.href = "ModeleDetail.html?id=" + GetUrlParam("projectID") ;
+        }
+
+    }
+
+
+    //CreatFile 
+    function CreatFile() {
+        //    console.log(arguments)
+        getFileID(arguments[0].id, arguments[0].name, arguments[0].tabIndex);
+    }
+    //获取文件id
+    function getFileID(id, name, index) {
+        var form = {};
+        form.mode = 'create';
+        form.projectName = name;
+        form.projectID = id;
+        form.fileID = 0;
+        form.filePath = '';
+        form.fileName = '';
+        form.token = token;//token;
+        GetCreatFtpInfo(form, index)
+    }
+    // 获取ftp新建参数
+    function GetCreatFtpInfo(form, index) {
+
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/createftp',
+                type: "POST",
+                dataType: "json",
+                data: form,
+                success: function (result) {
+                    //  string openFile (string type, string data，string file);
+                    if (bowserExplorer == 'ie') {
+                        var state = window.external.openFile('model', JSON.stringify(json[index]), JSON.stringify(result.Data));
+                        if (state == 'OK') {
+                            window.external.closeDialog(0);
+                            //锁定版单或者生产单 buyiLockModel --- ModelId 
+                            $.ajax(
+                                {
+                                    url: requestUrl + '/bmapi/demo/buyiLockModel',
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        ModelId: form.projectID,
+                                        token: token
+                                    },
+                                    success: function (result) {
+                                        // console.log(result);
+                                    },
+                                    error: function (xhr, status, p3, p4) {
+                                        var err = "Error " + " " + status + " " + p3;
+                                        if (xhr.responseText && xhr.responseText[0] == "{")
+                                            err = JSON.parse(xhr.responseText).message;
+                                        alert(err);
+                                    }
+                                });
+                        } else {
+                            alert(state);
+                        }
+                    } 
+                    else { 
+                        
+                        var state = window.buyiOpenFile('model', JSON.stringify(json[index]), JSON.stringify(result.Data));
+                        if (state == 'OK') {
+                            window.buyiCloseDialog(0);
+                            //锁定版单或者生产单 buyiLockModel --- ModelId 
+                            $.ajax(
+                                {
+                                    url: requestUrl + '/bmapi/demo/buyiLockModel',
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        ModelId: form.projectID,
+                                        token: token
+                                    },
+                                    success: function (result) {
+                                        // console.log(result);
+                                    },
+                                    error: function (xhr, status, p3, p4) {
+                                        var err = "Error " + " " + status + " " + p3;
+                                        if (xhr.responseText && xhr.responseText[0] == "{")
+                                            err = JSON.parse(xhr.responseText).message;
+                                        alert(err);
+                                    }
+                                });
+                        } else {
+                            alert(state);
+                        } 
+                    }
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    // 设置鼠标经过表头样式 
+    function setActiveCol(activeCol) {
+        activeCol.className = "activecol";
+    }
+
+    function setLoseFocusCol(col) {
+        col.className = "";
+    }
+</script>
+
+</html>

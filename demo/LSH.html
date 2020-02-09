@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<!-- 显示上传到服务器的团订订单的流水号和物料用量信息，没有团订业务的客户可以不实现此页面 -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>流水号页面</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/md5.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/pageMe.js"></script>
+</head>
+<style>
+    .model-table {
+        text-align: center;
+        /* margin-top: 80px; */
+    }
+
+    .submit-button button {
+        width: 200px;
+        height: 30px;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .table-list {
+        display: table;
+        margin: 0 auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    #table_fabric table {
+        width: 1000px;
+        height: 100%;
+        margin: 0 auto;
+    }
+</style>
+
+<body onload="init();initTwoArr()">
+    <div class="search" style="display: block">
+        <h3 class="bandan-title">团订订单信息</h2>
+            <div class="model-table">
+
+                <div class="table-list" id="table-list">
+
+                </div>
+
+                <!-- <button onclick="crossDomainRequest()">点击</button> -->
+            </div>
+    </div>
+    <div class="main">
+        <h3 class="bandan-title">物料信息</h2>
+            <div class="tab-head clearfloat">
+                <!-- <h2 class="selected">物料</h2> -->
+                <!-- <h2 >尺码</h2> -->
+
+
+            </div>
+            <div class="tab-content">
+
+                <div class="show " id="table_fabric">
+                </div>
+                <!-- <div  id="table_sizes">
+                    </div> -->
+                <!-- <div>content3</div> -->
+            </div>
+            <p class="submit-button">
+                <button onclick="handleSubmint()">上传</button>
+            </p>
+
+    </div>
+</body>
+<script type="text/javascript">
+    //------------以下是对二维数组的初始化与显示操作---------- 
+
+    var json = '';
+    var id = '';//团订id
+       //测试团订id
+    var orderIDArr = [20104,20118,20139,20162,20163,20164,20169,22226,22372,23690,23691,23859,23883,23884,23886]
+    //main函数
+    function initTwoArr() {
+        GetToken();
+        id = orderIDArr[Math.floor((Math.random() * orderIDArr.length))];
+        getlist();
+        forTableOne(JSON.parse(json));
+    }
+    //window.external. GetToken	 获得用户身份
+    function GetToken() {
+    	if (bowserExplorer == 'ie') {
+		    var mes = window.external.GetToken(1250, 900);
+			json = window.external.getData();
+			
+        } else {
+            var mes = window.buyiGetToken(1250, 900);
+			json = window.buyiGetData();
+        }
+        // alert(mes);返回值是mac;
+
+    }
+    //列表信息
+    function getlist() {
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/getorderinfo',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    orderId: id,
+                    token:token
+                },
+                success: function (result) {
+                    showTableList(result.Data);
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    //格式化表格
+    function forTableTwo(obj) {
+        var table = '<table class="tb" cellpadding="1" cellspacing="1"><thead><tr><th></th>';
+        for (let i = 0; i < obj.sizes.size_name.name.length; i++) {
+            table += '<th onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.sizes.size_name.name[i] + '</th>'
+        }
+        table += '</tr></thead><tbody>';
+        for (let i = 0; i < obj.sizes.parts.length; i++) {
+            table += '<tr><th  onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)">' + obj.sizes.parts[i].name + '</th>'
+            for (let j = 0; j < obj.sizes.parts[i].measures.length; j++) {
+                table += '<td onmousemove="setActiveCol(this)" onmouseout="setLoseFocusCol(this)" id=' + i + '-' + j + '>' + obj.sizes.parts[i].measures[j] + '</td>'
+            }
+            table += '</tr>'
+        }
+        table += '</tbody></table>'
+        // document.getElementById('main').innerHTML(table)
+        document.getElementById('table_sizes').innerHTML = table;
+
+    }
+    //初始化表格
+    function forTableOne(obj) {
+        let table = '<table class="tb"  cellpadding="1" cellspacing="1"><thead><tr>';
+        let arr = [];
+        console.log(obj)
+        for (let str in obj.fabric[0]) {
+            // console.log(obj.version.fabric[0]);
+            table += '<th>' + str + '</th>'
+            arr.push(str)
+        }
+        // console.log(arr)
+        table += '</tr></thead><tbody>';
+        for (let i = 0; i < obj.fabric.length; i++) {
+            // table += '<tr>'
+            table += '<tr>'
+            for (let str in obj.fabric[0]) {
+                table += '<td>' + obj.fabric[i][str] + '</td>'
+            }
+            table += '</tr>'
+        }
+        table += '</tbody></table>';
+        // console.log(table)
+        document.getElementById('table_fabric').innerHTML = table;
+    }
+    //表格列表数据
+    function showTableList(obj) {
+        // console.log(obj)
+        let table = '<table class="" style="width:800px" width="700" ><tbody>';
+        table += '<th align="center">OrderName</th><th align="center">CustomerName</th><th align="center">CreateTime</th><th align="center">Remark</th>'
+        table += '<tr><td>' + obj.OrderName + '</td>' + '<td>' + obj.CustomerName + '</td><td>' + TimeChange(obj.CreateTime) + '</td>' + '<td >' + obj.Remark + '</td>' + '</tr>'
+        table += '</tbody></table>';
+        document.getElementById('table-list').innerHTML = table;
+    }
+
+    //上传
+    function handleSubmint() {
+
+        $.ajax(
+            {
+                url: requestUrl + '/bmapi/demo/buyiPostTD',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    lsh: JSON.stringify(json),
+                    token:token
+                },
+                success: function (result) {
+                    // console.log(result)
+                    if (result.Success == true) {
+                        if (bowserExplorer == 'ie'){
+							window.external.closeDialog(0);
+						}else{
+							window.buyiCloseDialog(0);
+						}
+                    } else {
+                        alert(result.ErrMes);
+                    }
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+    }
+    // 设置鼠标经过表头样式 
+    function setActiveCol(activeCol) {
+        activeCol.className = "activecol";
+    }
+
+    function setLoseFocusCol(col) {
+        col.className = "";
+    }
+</script>
+
+</html>
